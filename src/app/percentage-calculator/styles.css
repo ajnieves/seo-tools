@@ -1,0 +1,18 @@
+.calculator-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .calculator-layout {
+    padding: 2rem;
+  }
+}
+
+.content-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+}
