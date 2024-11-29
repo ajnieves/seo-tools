@@ -59,6 +59,11 @@ const NavItem = styled.div<{ active?: boolean }>`
 
 const tools = [
   {
+    name: 'Home',
+    href: '/',
+    description: 'Return to homepage'
+  },
+  {
     name: 'Entity Analyzer',
     href: '/entity-analyzer',
     description: 'Extract and analyze named entities'

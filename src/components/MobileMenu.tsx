@@ -90,6 +90,11 @@ const NavItem = styled.div<{ active?: boolean }>`
 
 const tools = [
   {
+    name: 'Home',
+    href: '/',
+    description: 'Return to homepage'
+  },
+  {
     name: 'Entity Analyzer',
     href: '/entity-analyzer',
     description: 'Extract and analyze named entities'
@@ -157,9 +162,6 @@ export default function MobileMenu() {
 
       <MenuContainer isOpen={isOpen}>
         <Nav>
-          <NavItem active={router.pathname === '/'}>
-            <Link href="/">Home</Link>
-          </NavItem>
           {tools.map((tool) => (
             <NavItem 
               key={tool.href} 
@@ -168,6 +170,7 @@ export default function MobileMenu() {
               <Link 
                 href={tool.href}
                 title={tool.description}
+                onClick={closeMenu}
               >
                 {tool.name}
               </Link>
