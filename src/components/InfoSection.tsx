@@ -1,92 +1,86 @@
 import styled from '@emotion/styled';
 
 const Container = styled.div`
-  margin-bottom: 30px;
-  padding: 20px;
-  background: rgba(26, 26, 46, 0.6);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 3rem 0;
 `;
 
 const Title = styled.h2`
-  color: #00ff9d;
-  margin-bottom: 15px;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
 `;
 
-const Section = styled.div`
-  margin-bottom: 20px;
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: var(--surface-color);
+  border-radius: 8px;
+  overflow: hidden;
 
-  &:last-child {
-    margin-bottom: 0;
+  th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
   }
-`;
 
-const SectionTitle = styled.h3`
-  color: #00a8e8;
-  margin-bottom: 10px;
-`;
+  th {
+    background: rgba(0, 255, 157, 0.1);
+    color: var(--primary-color);
+    font-weight: 600;
+  }
 
-const Text = styled.p`
-  color: #fff;
-  margin-bottom: 10px;
-`;
+  td {
+    color: var(--text-color);
+  }
 
-const List = styled.ul`
-  color: #fff;
-  padding-left: 20px;
-`;
-
-const ListItem = styled.li`
-  margin-bottom: 5px;
-
-  strong {
-    color: #00ff9d;
+  tr:last-child {
+    td {
+      border-bottom: none;
+    }
   }
 `;
 
 export default function InfoSection() {
   return (
     <Container>
-      <Title>About the Analysis</Title>
-      
-      <Section>
-        <SectionTitle>Entity Types</SectionTitle>
-        <Text>
-          Entities are categorized into the following types:
-        </Text>
-        <List>
-          <ListItem><strong>PERSON</strong>: Names of individuals (e.g., authors, historical figures)</ListItem>
-          <ListItem><strong>ORGANIZATION</strong>: Companies, institutions, or groups</ListItem>
-          <ListItem><strong>LOCATION</strong>: Geographic locations, places, or landmarks</ListItem>
-          <ListItem><strong>UNKNOWN</strong>: Entities that don't clearly fit into other categories</ListItem>
-        </List>
-      </Section>
-
-      <Section>
-        <SectionTitle>Salience Score</SectionTitle>
-        <Text>
-          The salience score (0-100%) indicates how important or central an entity is to the overall content:
-        </Text>
-        <List>
-          <ListItem>Higher percentages (e.g., 80-100%) suggest the entity is a primary subject</ListItem>
-          <ListItem>Medium percentages (e.g., 30-79%) indicate significant but not dominant entities</ListItem>
-          <ListItem>Lower percentages (e.g., 1-29%) represent less prominent mentions</ListItem>
-        </List>
-      </Section>
-
-      <Section>
-        <SectionTitle>Sentiment Analysis</SectionTitle>
-        <Text>
-          The overall sentiment of the content is described using one of these terms:
-        </Text>
-        <List>
-          <ListItem><strong>Positive</strong>: Strongly favorable or optimistic content</ListItem>
-          <ListItem><strong>Optimistic</strong>: Moderately positive outlook</ListItem>
-          <ListItem><strong>Balanced</strong>: Neutral or mixed sentiment</ListItem>
-          <ListItem><strong>Critical</strong>: Moderately negative perspective</ListItem>
-          <ListItem><strong>Negative</strong>: Strongly unfavorable or pessimistic content</ListItem>
-        </List>
-      </Section>
+      <Title>Entity Types Reference</Title>
+      <Table>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PERSON</td>
+            <td>Individual names and personas</td>
+            <td>Albert Einstein, Leonardo da Vinci</td>
+          </tr>
+          <tr>
+            <td>ORGANIZATION</td>
+            <td>Companies, institutions, and groups</td>
+            <td>Google, United Nations, NASA</td>
+          </tr>
+          <tr>
+            <td>LOCATION</td>
+            <td>Places and geographical areas</td>
+            <td>Paris, Mount Everest, Pacific Ocean</td>
+          </tr>
+          <tr>
+            <td>EVENT</td>
+            <td>Historical events and occurrences</td>
+            <td>World War II, Olympics</td>
+          </tr>
+          <tr>
+            <td>WORK</td>
+            <td>Creative works and products</td>
+            <td>Mona Lisa, iPhone, Harry Potter</td>
+          </tr>
+        </tbody>
+      </Table>
     </Container>
   );
 }
