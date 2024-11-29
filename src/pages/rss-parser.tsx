@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import AboutSection from '@/components/AboutSection';
-import FAQSection from '@/components/FAQSection';
 
 const Container = styled.div`
+  padding: 2rem;
   max-width: 800px;
   margin: 0 auto;
 `;
@@ -19,10 +18,6 @@ const Form = styled.form`
   margin-bottom: 2rem;
 `;
 
-const InputGroup = styled.div`
-  margin-bottom: 1rem;
-`;
-
 const Input = styled.input`
   width: 100%;
   padding: 1rem;
@@ -31,6 +26,7 @@ const Input = styled.input`
   color: var(--text-color);
   border-radius: 8px;
   font-size: 1rem;
+  margin-bottom: 1rem;
   transition: all 0.2s ease;
 
   &:focus {
@@ -41,10 +37,6 @@ const Input = styled.input`
 
   &::placeholder {
     color: var(--text-secondary);
-  }
-
-  &:invalid {
-    border-color: #ff4d4d;
   }
 `;
 
@@ -87,36 +79,36 @@ const ErrorMessage = styled.div`
   border-radius: 8px;
 `;
 
-const ResultsSection = styled.div`
+const ResultSection = styled.div`
   margin-top: 2rem;
 `;
 
-const ResultsTitle = styled.h2`
+const FeedInfo = styled.div`
+  padding: 1.5rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+`;
+
+const FeedTitle = styled.h2`
   color: var(--primary-color);
-  text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1.8rem;
 `;
 
-const SentimentBadge = styled.div<{ sentiment: string }>`
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background: rgba(0, 255, 157, 0.1);
-  border: 1px solid var(--primary-color);
-  border-radius: 20px;
-  color: var(--primary-color);
-  font-weight: 600;
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
+const FeedDescription = styled.p`
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
 `;
 
-const EntityList = styled.div`
+const ItemsList = styled.div`
   display: grid;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 1.5rem;
 `;
 
-const EntityItem = styled.div`
+const FeedItem = styled.div`
   padding: 1.5rem;
   background: var(--surface-color);
   border: 1px solid var(--border-color);
@@ -129,38 +121,42 @@ const EntityItem = styled.div`
   }
 `;
 
-const EntityName = styled.h3`
+const ItemTitle = styled.h3`
   color: var(--primary-color);
-  margin: 0 0 0.5rem 0;
+  margin-bottom: 0.5rem;
   font-size: 1.2rem;
 `;
 
-const EntityDetail = styled.p`
-  color: var(--text-color);
-  margin: 0;
-  opacity: 0.9;
-
-  & + & {
-    margin-top: 0.25rem;
-  }
+const ItemMeta = styled.div`
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 `;
 
-interface Entity {
-  name: string;
-  type: string;
-  salience: number;
+const ItemDescription = styled.p`
+  color: var(--text-color);
+  line-height: 1.6;
+`;
+
+interface FeedItem {
+  title: string;
+  link: string;
+  description: string;
+  pubDate: string;
 }
 
-interface AnalysisResult {
-  entities: Entity[];
-  sentiment: string;
+interface FeedData {
+  title: string;
+  description: string;
+  link: string;
+  items: FeedItem[];
 }
 
-export default function EntityAnalyzer() {
+export default function RSSParser() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [feedData, setFeedData] = useState<FeedData | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,16 +168,10 @@ export default function EntityAnalyzer() {
     }
 
     try {
-      // Validate URL format
-      const urlObj = new URL(url);
-      if (!['http:', 'https:'].includes(urlObj.protocol)) {
-        throw new Error('URL must start with http:// or https://');
-      }
-
       setLoading(true);
-      setResult(null);
+      setFeedData(null);
 
-      const response = await fetch('/api/entity-analysis', {
+      const response = await fetch('/api/parse-rss', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,13 +182,10 @@ export default function EntityAnalyzer() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to analyze URL');
+        throw new Error(data.error || 'Failed to parse RSS feed');
       }
 
-      setResult({
-        entities: data.entities,
-        sentiment: data.sentiment
-      });
+      setFeedData(data);
     } catch (err) {
       console.error('Error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -209,28 +196,25 @@ export default function EntityAnalyzer() {
 
   return (
     <Container>
-      <Title>Entity Analyzer</Title>
+      <Title>RSS Feed Parser</Title>
 
-      <Form onSubmit={handleSubmit} noValidate>
-        <InputGroup>
-          <Input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter URL to analyze (e.g., https://example.com)"
-            pattern="https?://.*"
-            required
-            disabled={loading}
-          />
-        </InputGroup>
+      <Form onSubmit={handleSubmit}>
+        <Input
+          type="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter RSS feed URL (e.g., https://example.com/feed.xml)"
+          required
+          disabled={loading}
+        />
         <Button type="submit" disabled={loading}>
-          {loading ? 'Analyzing...' : 'Analyze URL'}
+          {loading ? 'Parsing...' : 'Parse Feed'}
         </Button>
       </Form>
 
       {loading && (
         <LoadingMessage>
-          Analyzing content...
+          Parsing RSS feed...
         </LoadingMessage>
       )}
 
@@ -240,30 +224,28 @@ export default function EntityAnalyzer() {
         </ErrorMessage>
       )}
 
-      {result && (
-        <ResultsSection>
-          <ResultsTitle>Analysis Results</ResultsTitle>
-          
-          <div style={{ textAlign: 'center' }}>
-            <SentimentBadge sentiment={result.sentiment}>
-              {result.sentiment} Sentiment
-            </SentimentBadge>
-          </div>
+      {feedData && (
+        <ResultSection>
+          <FeedInfo>
+            <FeedTitle>{feedData.title}</FeedTitle>
+            <FeedDescription>{feedData.description}</FeedDescription>
+            <a href={feedData.link} target="_blank" rel="noopener noreferrer">Visit Website</a>
+          </FeedInfo>
 
-          <EntityList>
-            {result.entities.map((entity, index) => (
-              <EntityItem key={index}>
-                <EntityName>{entity.name}</EntityName>
-                <EntityDetail>Type: {entity.type}</EntityDetail>
-                <EntityDetail>Salience: {(entity.salience * 100).toFixed(2)}%</EntityDetail>
-              </EntityItem>
+          <ItemsList>
+            {feedData.items.map((item, index) => (
+              <FeedItem key={index}>
+                <ItemTitle>{item.title}</ItemTitle>
+                <ItemMeta>
+                  Published: {new Date(item.pubDate).toLocaleDateString()}
+                </ItemMeta>
+                <ItemDescription>{item.description}</ItemDescription>
+                <a href={item.link} target="_blank" rel="noopener noreferrer">Read More</a>
+              </FeedItem>
             ))}
-          </EntityList>
-        </ResultsSection>
+          </ItemsList>
+        </ResultSection>
       )}
-
-      <AboutSection />
-      <FAQSection />
     </Container>
   );
 }
