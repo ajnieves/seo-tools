@@ -1,7 +1,143 @@
 'use client';
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import SentimentResults from './SentimentResults';
+import InfoSection from './InfoSection';
+
+const Container = styled.div`
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const Title = styled.h1`
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+`;
+
+const Form = styled.form`
+  margin-bottom: 2rem;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 1rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 255, 157, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 1rem;
+  background: var(--primary-color);
+  color: var(--background-color);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 255, 157, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+`;
+
+const LoadingMessage = styled.div`
+  color: var(--primary-color);
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+`;
+
+const ErrorMessage = styled.div`
+  color: #ff4d4d;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 77, 77, 0.1);
+  border: 1px solid rgba(255, 77, 77, 0.2);
+  border-radius: 8px;
+`;
+
+const ResultsSection = styled.div`
+  margin-top: 2rem;
+`;
+
+const ResultsTitle = styled.h2`
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+`;
+
+const SentimentBadge = styled.div<{ sentiment: string }>`
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 255, 157, 0.1);
+  border: 1px solid var(--primary-color);
+  border-radius: 20px;
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+`;
+
+const EntityList = styled.div`
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+`;
+
+const EntityItem = styled.div`
+  padding: 1.5rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 255, 157, 0.1);
+  }
+`;
+
+const EntityName = styled.h3`
+  color: var(--primary-color);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+`;
+
+const EntityDetail = styled.p`
+  color: var(--text-color);
+  margin: 0;
+  opacity: 0.9;
+
+  & + & {
+    margin-top: 0.25rem;
+  }
+`;
 
 interface Entity {
   name: string;
@@ -14,123 +150,31 @@ interface AnalysisResult {
   sentiment: string;
 }
 
-const Container = styled.div`
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-`;
-
-const Title = styled.h1`
-  color: #00ff9d;
-  margin-bottom: 20px;
-`;
-
-const InputContainer = styled.div`
-  margin-bottom: 20px;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: #1a1a2e;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 4px;
-
-  &:focus {
-    outline: none;
-    border-color: #00ff9d;
-  }
-`;
-
-const Button = styled.button<{ disabled: boolean }>`
-  width: 100%;
-  padding: 10px;
-  background: ${props => props.disabled ? '#333' : '#00ff9d'};
-  color: ${props => props.disabled ? '#666' : '#1a1a2e'};
-  border: none;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  border-radius: 4px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 255, 157, 0.2);
-  }
-`;
-
-const ErrorMessage = styled.div`
-  color: #ff4d4d;
-  padding: 10px;
-  margin-bottom: 20px;
-  background: rgba(255, 77, 77, 0.1);
-  border-radius: 4px;
-  border: 1px solid rgba(255, 77, 77, 0.2);
-`;
-
-const LoadingMessage = styled.div`
-  color: #00ff9d;
-  text-align: center;
-  padding: 20px;
-`;
-
-const ResultsSection = styled.div`
-  margin-bottom: 30px;
-`;
-
-const EntityList = styled.div`
-  display: grid;
-  gap: 10px;
-`;
-
-const EntityItem = styled.div`
-  padding: 15px;
-  background: #1a1a2e;
-  border: 1px solid #333;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 255, 157, 0.1);
-  }
-`;
-
-const EntityName = styled.h3`
-  color: #00ff9d;
-  margin: 0 0 5px 0;
-`;
-
-const EntityDetail = styled.p`
-  color: #fff;
-  margin: 0;
-  margin-top: 5px;
-`;
-
-const EntityResultsTitle = styled.h2`
-  color: #00ff9d;
-  margin-bottom: 15px;
-`;
-
 export default function SimpleEntityAnalyzer() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
-  const handleAnalyze = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
     if (!url) {
       setError('Please enter a URL');
       return;
     }
 
-    setLoading(true);
-    setError('');
-    setResult(null);
-
     try {
+      // Validate URL format
+      const urlObj = new URL(url);
+      if (!['http:', 'https:'].includes(urlObj.protocol)) {
+        throw new Error('URL must start with http:// or https://');
+      }
+
+      setLoading(true);
+      setResult(null);
+
       const response = await fetch('/api/entity-analysis', {
         method: 'POST',
         headers: {
@@ -143,10 +187,6 @@ export default function SimpleEntityAnalyzer() {
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to analyze URL');
-      }
-
-      if (!data.entities || !Array.isArray(data.entities)) {
-        throw new Error('No entities found');
       }
 
       setResult({
@@ -164,22 +204,20 @@ export default function SimpleEntityAnalyzer() {
   return (
     <Container>
       <Title>Entity Analyzer</Title>
-      
-      <InputContainer>
+
+      <Form onSubmit={handleSubmit}>
         <Input
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter URL to analyze"
+          placeholder="Enter URL to analyze (e.g., https://example.com)"
+          required
           disabled={loading}
         />
-        <Button 
-          onClick={handleAnalyze}
-          disabled={loading || !url}
-        >
+        <Button type="submit" disabled={loading}>
           {loading ? 'Analyzing...' : 'Analyze URL'}
         </Button>
-      </InputContainer>
+      </Form>
 
       {loading && (
         <LoadingMessage>
@@ -195,9 +233,14 @@ export default function SimpleEntityAnalyzer() {
 
       {result && (
         <ResultsSection>
-          <SentimentResults sentiment={result.sentiment} />
+          <ResultsTitle>Analysis Results</ResultsTitle>
           
-          <EntityResultsTitle>Entity Analysis Results</EntityResultsTitle>
+          <div style={{ textAlign: 'center' }}>
+            <SentimentBadge sentiment={result.sentiment}>
+              {result.sentiment} Sentiment
+            </SentimentBadge>
+          </div>
+
           <EntityList>
             {result.entities.map((entity, index) => (
               <EntityItem key={index}>
