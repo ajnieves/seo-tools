@@ -1,12 +1,3 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "buildCommand": "npm run generate-sitemap && next build"
-      }
-    }
-  ]
+  "version": 2
 }
