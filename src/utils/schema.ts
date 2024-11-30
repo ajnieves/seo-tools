@@ -1,13 +1,10 @@
 type SchemaFunction = () => object;
 
-const BASE_URL = 'https://seo-tools.vercel.app';
-
 export const schema = {
   home: (): object => ({
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "SEO Tools",
-    "url": BASE_URL,
     "applicationCategory": "SEO Software",
     "description": "A suite of powerful SEO tools to help optimize your website, analyze content, and improve search engine visibility.",
     "offers": {
@@ -22,7 +19,6 @@ export const schema = {
     "@type": "SoftwareApplication",
     "name": "Entity Analyzer",
     "applicationCategory": "Text Analysis Tool",
-    "url": `${BASE_URL}/entity-analyzer`,
     "description": "Analyze web content to identify and extract named entities, understand key subjects, organizations, and locations.",
     "featureList": [
       "Named Entity Recognition",
@@ -37,7 +33,6 @@ export const schema = {
     "@type": "SoftwareApplication",
     "name": "XML Sitemap Generator",
     "applicationCategory": "SEO Tool",
-    "url": `${BASE_URL}/sitemap-generator`,
     "description": "Generate XML sitemaps to help search engines better understand and index your website structure.",
     "featureList": [
       "XML Sitemap Generation",
@@ -52,7 +47,6 @@ export const schema = {
     "@type": "SoftwareApplication",
     "name": "RSS Feed Parser",
     "applicationCategory": "Feed Analysis Tool",
-    "url": `${BASE_URL}/rss-parser`,
     "description": "Parse and validate RSS feeds to ensure proper syndication and content distribution.",
     "featureList": [
       "RSS Feed Validation",
@@ -67,7 +61,6 @@ export const schema = {
     "@type": "SoftwareApplication",
     "name": "Robots.txt Tester",
     "applicationCategory": "SEO Tool",
-    "url": `${BASE_URL}/robots-tester`,
     "description": "Test and validate your robots.txt file to ensure proper search engine crawler access control.",
     "featureList": [
       "Robots.txt Validation",
@@ -82,7 +75,6 @@ export const schema = {
     "@type": ["SoftwareApplication", "Calculator"],
     "name": "Percentage Calculator",
     "applicationCategory": "Calculator",
-    "url": `${BASE_URL}/percentage-calculator`,
     "description": "Calculate percentages for SEO metrics, conversion rates, and performance indicators.",
     "featureList": [
       "Percentage Calculations",
@@ -96,8 +88,6 @@ export const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "SEO Tools",
-    "url": BASE_URL,
-    "logo": `${BASE_URL}/favicon.svg`,
     "description": "Provider of free SEO and web analysis tools",
     "sameAs": [
       "https://github.com/your-github",
@@ -106,7 +96,7 @@ export const schema = {
   })
 } as const;
 
-export function getBreadcrumbSchema(pageName: string, path: string): object {
+export function getBreadcrumbSchema(origin: string, pageName: string, path: string): object {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -115,30 +105,49 @@ export function getBreadcrumbSchema(pageName: string, path: string): object {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": BASE_URL
+        "item": origin
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": pageName,
-        "item": `${BASE_URL}${path}`
+        "item": `${origin}${path}`
       }
     ]
   };
 }
 
-export function getPageSchema(page: keyof typeof schema, options?: { pageName?: string; path?: string }): string {
+export function getPageSchema(page: keyof typeof schema, options?: { pageName?: string; path?: string; origin?: string }): string {
   const schemas = [];
+  const currentSchema = schema[page]();
 
-  // Add the page-specific schema
-  schemas.push(schema[page]());
+  // Add URL to schema if origin is provided
+  if (options?.origin) {
+    const schemaWithUrl = {
+      ...currentSchema,
+      url: options.origin + (page === 'home' ? '' : options.path)
+    };
+    schemas.push(schemaWithUrl);
+  } else {
+    schemas.push(currentSchema);
+  }
 
-  // Add organization schema to all pages
-  schemas.push(schema.organization());
+  // Add organization schema with URL if origin is provided
+  const orgSchema = schema.organization();
+  if (options?.origin) {
+    const orgSchemaWithUrl = {
+      ...orgSchema,
+      url: options.origin,
+      logo: `${options.origin}/favicon.svg`
+    };
+    schemas.push(orgSchemaWithUrl);
+  } else {
+    schemas.push(orgSchema);
+  }
 
   // Add breadcrumb schema to all pages except home
-  if (page !== 'home' && options?.pageName && options?.path) {
-    schemas.push(getBreadcrumbSchema(options.pageName, options.path));
+  if (page !== 'home' && options?.pageName && options?.path && options?.origin) {
+    schemas.push(getBreadcrumbSchema(options.origin, options.pageName, options.path));
   }
 
   return JSON.stringify(schemas);
