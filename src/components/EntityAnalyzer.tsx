@@ -19,11 +19,11 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const Title = styled.h1`
+const Title = styled.h2`
   color: var(--primary-color);
   margin-bottom: 2rem;
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   letter-spacing: -0.02em;
 `;
 
@@ -190,7 +190,7 @@ export default function EntityAnalyzer() {
 
   return (
     <Container>
-      <Title>Entity Analyzer</Title>
+      <Title>Analyze Content</Title>
 
       <Form onSubmit={handleSubmit}>
         <Input

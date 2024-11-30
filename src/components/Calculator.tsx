@@ -1,8 +1,8 @@
 'use client';
 import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
-import Button from '@/components/Button';
-import PercentageDifferenceCalculator from '@/components/PercentageDifferenceCalculator';
+import Button from './Button';
+import PercentageDifferenceCalculator from './PercentageDifferenceCalculator';
 
 const Container = styled.div`
   max-width: 900px;
@@ -11,20 +11,6 @@ const Container = styled.div`
 
   @media (min-width: 768px) {
     padding: 2rem;
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  background: linear-gradient(135deg, #00a8e8, #00ff9d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-align: center;
-
-  @media (min-width: 768px) {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
   }
 `;
 
@@ -231,8 +217,6 @@ export default function Calculator() {
 
   return (
     <Container>
-      <Title>Percentage Calculator</Title>
-
       <Grid>
         <CalculatorSection>
           <SectionTitle>What is X% of Y?</SectionTitle>
