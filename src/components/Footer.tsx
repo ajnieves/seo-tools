@@ -50,17 +50,6 @@ const StyledLink = styled.span`
   }
 `;
 
-const ExternalLink = styled.a`
-  color: var(--text-color);
-  text-decoration: none;
-  transition: color 0.2s ease;
-  font-size: 0.95rem;
-
-  &:hover {
-    color: var(--primary-color);
-  }
-`;
-
 const FooterText = styled.p`
   color: var(--text-secondary);
   font-size: 0.95rem;
@@ -74,12 +63,6 @@ const BottomBar = styled.div`
   text-align: center;
   color: var(--text-secondary);
   font-size: 0.9rem;
-`;
-
-const SocialLinks = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
 `;
 
 const tools = [
