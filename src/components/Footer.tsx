@@ -114,14 +114,6 @@ export default function Footer() {
           <FooterText>
             A comprehensive suite of tools designed to help you optimize your website's SEO performance and improve your online visibility.
           </FooterText>
-          <SocialLinks>
-            <ExternalLink href="https://github.com" target="_blank" rel="noopener noreferrer">
-              GitHub
-            </ExternalLink>
-            <ExternalLink href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-              Twitter
-            </ExternalLink>
-          </SocialLinks>
         </FooterSection>
 
         <FooterSection>
