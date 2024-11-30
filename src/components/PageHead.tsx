@@ -14,13 +14,18 @@ export default function PageHead({ page }: PageHeadProps) {
       <meta name="description" content={metadata.description} />
       <meta name="keywords" content={metadata.keywords.join(', ')} />
       
+      {/* Canonical URL */}
+      <link rel="canonical" href={metadata.canonicalUrl} />
+      
       {/* Open Graph / Facebook */}
       <meta property="og:type" content="website" />
+      <meta property="og:url" content={metadata.canonicalUrl} />
       <meta property="og:title" content={metadata.title} />
       <meta property="og:description" content={metadata.description} />
       
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={metadata.canonicalUrl} />
       <meta name="twitter:title" content={metadata.title} />
       <meta name="twitter:description" content={metadata.description} />
 

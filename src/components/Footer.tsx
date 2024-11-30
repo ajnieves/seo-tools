@@ -132,43 +132,11 @@ export default function Footer() {
             </Link>
           ))}
         </FooterSection>
-
-        <FooterSection>
-          <SectionTitle>Resources</SectionTitle>
-          <Link href="/blog" passHref legacyBehavior>
-            <StyledLink>Blog</StyledLink>
-          </Link>
-          <Link href="/guides" passHref legacyBehavior>
-            <StyledLink>SEO Guides</StyledLink>
-          </Link>
-          <Link href="/tutorials" passHref legacyBehavior>
-            <StyledLink>Tutorials</StyledLink>
-          </Link>
-          <Link href="/documentation" passHref legacyBehavior>
-            <StyledLink>Documentation</StyledLink>
-          </Link>
-        </FooterSection>
-
-        <FooterSection>
-          <SectionTitle>Legal</SectionTitle>
-          <Link href="/privacy" passHref legacyBehavior>
-            <StyledLink>Privacy Policy</StyledLink>
-          </Link>
-          <Link href="/terms" passHref legacyBehavior>
-            <StyledLink>Terms of Service</StyledLink>
-          </Link>
-          <Link href="/cookies" passHref legacyBehavior>
-            <StyledLink>Cookie Policy</StyledLink>
-          </Link>
-          <Link href="/contact" passHref legacyBehavior>
-            <StyledLink>Contact Us</StyledLink>
-          </Link>
-        </FooterSection>
       </FooterContent>
 
       <BottomBar>
         <FooterText>
-          © {new Date().getFullYear()} SEO Tools. All rights reserved.
+          © {new Date().getFullYear()} Technical SEO Tools. All rights reserved.
         </FooterText>
       </BottomBar>
     </FooterContainer>
