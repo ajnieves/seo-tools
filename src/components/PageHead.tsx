@@ -23,6 +23,7 @@ export default function PageHead({ page }: PageHeadProps) {
 
   return (
     <Head>
+      <meta name="google-site-verification" content="NGx9xLCGuT_79aJ944wJVzF45g78u6marGFNFxI9V9U" />
       <title>{metadata.title}</title>
       <meta name="description" content={metadata.description} />
       <meta name="keywords" content={metadata.keywords.join(', ')} />

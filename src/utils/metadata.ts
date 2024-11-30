@@ -13,7 +13,7 @@ const BASE_URL = 'https://seo-tools.vercel.app';
 
 export const metadata: SiteMetadata = {
   home: {
-    title: 'SEO Tools - Comprehensive SEO Toolkit',
+    title: 'Technical SEO Tools | Comprehensive SEO Toolkit',
     description: 'A suite of powerful SEO tools to help optimize your website, analyze content, and improve search engine visibility.',
     keywords: ['SEO tools', 'website optimization', 'SEO analysis', 'search engine optimization'],
     canonicalUrl: `${BASE_URL}`,
