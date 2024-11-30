@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import { getPageMetadata } from '@/utils/metadata';
+import { getPageSchema } from '@/utils/schema';
 
 interface PageHeadProps {
   page: string;
@@ -7,6 +8,10 @@ interface PageHeadProps {
 
 export default function PageHead({ page }: PageHeadProps) {
   const metadata = getPageMetadata(page as any);
+  const schema = getPageSchema(page as any, {
+    pageName: metadata.title,
+    path: metadata.canonicalUrl.replace('https://seo-tools.vercel.app', '')
+  });
 
   return (
     <Head>
@@ -28,6 +33,13 @@ export default function PageHead({ page }: PageHeadProps) {
       <meta name="twitter:url" content={metadata.canonicalUrl} />
       <meta name="twitter:title" content={metadata.title} />
       <meta name="twitter:description" content={metadata.description} />
+
+      {/* Schema.org JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: schema }}
+        key="schema-data"
+      />
 
       {/* Favicon */}
       <link rel="icon" href="/favicon.svg" />
