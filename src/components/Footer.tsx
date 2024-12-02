@@ -2,19 +2,37 @@ import Link from 'next/link';
 import styled from '@emotion/styled';
 
 const FooterContainer = styled.footer`
-  margin-top: 4rem;
-  padding: 4rem 0;
+  margin-top: var(--space-10);
+  padding: var(--space-10) 0;
   background: var(--surface-color);
   border-top: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--primary-color),
+      transparent
+    );
+    opacity: 0.5;
+  }
 `;
 
 const FooterContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 var(--space-6);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 3rem;
+  gap: var(--space-8);
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -28,41 +46,75 @@ const FooterContent = styled.div`
 const FooterSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
 `;
 
 const SectionTitle = styled.h3`
   color: var(--primary-color);
   font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2);
+  position: relative;
+  padding-bottom: var(--space-2);
+
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--primary-color);
+    border-radius: var(--radius-full);
+  }
 `;
 
 const StyledLink = styled.span`
   color: var(--text-color);
   text-decoration: none;
-  transition: color 0.2s ease;
-  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  font-size: 1rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    transition: transform 0.2s ease;
+  }
 
   &:hover {
     color: var(--primary-color);
+    transform: translateX(4px);
+
+    svg {
+      transform: translateX(2px);
+    }
   }
 `;
 
 const FooterText = styled.p`
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.6;
+  margin: 0;
 `;
 
 const BottomBar = styled.div`
-  margin-top: 3rem;
-  padding-top: 2rem;
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
   border-top: 1px solid var(--border-color);
   text-align: center;
   color: var(--text-secondary);
   font-size: 0.9rem;
+  background: linear-gradient(
+    180deg,
+    var(--surface-color),
+    rgba(24, 24, 27, 0.8)
+  );
 `;
 
 const tools = [
@@ -103,7 +155,20 @@ export default function Footer() {
           <SectionTitle>Tools</SectionTitle>
           {tools.map((tool) => (
             <Link key={tool.href} href={tool.href} passHref legacyBehavior>
-              <StyledLink>{tool.name}</StyledLink>
+              <StyledLink>
+                {tool.name}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </StyledLink>
             </Link>
           ))}
         </FooterSection>
