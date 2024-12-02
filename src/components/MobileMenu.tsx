@@ -6,8 +6,8 @@ import styled from '@emotion/styled';
 const MenuButton = styled.button`
   position: fixed;
   top: 1rem;
-  right: 1rem;
-  z-index: 1000;
+  left: 1rem;
+  z-index: 1100;
   background: var(--surface-color);
   border: 1px solid var(--border-color);
   color: var(--primary-color);
@@ -19,9 +19,26 @@ const MenuButton = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 0;
 
   &:hover {
-    background: rgba(0, 255, 157, 0.1);
+    background: var(--surface-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--primary-color);
+    stroke-width: 1.5;
+    transition: transform 0.3s ease;
+    display: block;
+  }
+
+  &:hover svg {
+    transform: scale(1.1);
   }
 
   @media (max-width: 768px) {
@@ -36,7 +53,8 @@ const MenuOverlay = styled.div<{ isOpen: boolean }>`
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
+  backdrop-filter: blur(4px);
+  z-index: 1090;
   opacity: ${props => props.isOpen ? 1 : 0};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
   transition: all 0.3s ease;
@@ -49,15 +67,16 @@ const MenuOverlay = styled.div<{ isOpen: boolean }>`
 const MenuContainer = styled.div<{ isOpen: boolean }>`
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   bottom: 0;
   width: 280px;
-  background: var(--surface-color);
-  z-index: 999;
+  background: var(--background-color);
+  z-index: 1095;
   padding: 5rem 1.5rem 2rem;
-  transform: translateX(${props => props.isOpen ? '0' : '100%'});
-  transition: transform 0.3s ease;
+  transform: translateX(${props => props.isOpen ? '0' : '-100%'});
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
 
   @media (min-width: 769px) {
     display: none;
@@ -67,23 +86,25 @@ const MenuContainer = styled.div<{ isOpen: boolean }>`
 const Nav = styled.nav`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 `;
 
 const NavItem = styled.div<{ active?: boolean }>`
   a {
     display: block;
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1.25rem;
     color: ${props => props.active ? 'var(--primary-color)' : 'var(--text-color)'};
-    border-radius: 8px;
+    border-radius: 12px;
     transition: all 0.2s ease;
     font-weight: ${props => props.active ? '600' : '400'};
     background: ${props => props.active ? 'rgba(0, 255, 157, 0.1)' : 'transparent'};
     text-decoration: none;
+    font-size: 1.1rem;
 
     &:hover {
       background: rgba(0, 255, 157, 0.1);
       color: var(--primary-color);
+      transform: translateX(4px);
     }
   }
 `;
@@ -137,12 +158,8 @@ export default function MobileMenu() {
     <>
       <MenuButton onClick={toggleMenu} aria-label="Toggle menu">
         <svg
-          width="24"
-          height="24"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
