@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import PageHead from '@/components/PageHead';
-import AboutSection from '@/components/AboutSection';
-import FAQSection from '@/components/FAQSection';
 import Calculator from '@/components/Calculator';
+import CalculatorAboutSection from '@/components/CalculatorAboutSection';
+import CalculatorFAQSection from '@/components/CalculatorFAQSection';
 
 const Container = styled.div`
   max-width: 800px;
@@ -24,8 +24,8 @@ export default function PercentageCalculatorPage() {
       <Container>
         <Title>Percentage Calculator</Title>
         <Calculator />
-        <AboutSection />
-        <FAQSection />
+        <CalculatorAboutSection />
+        <CalculatorFAQSection />
       </Container>
     </>
   );

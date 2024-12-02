@@ -124,13 +124,19 @@ const Layout = styled.div`
 
 const MainContent = styled.main`
   flex: 1;
-  margin-left: 250px;
   padding: 2rem;
   position: relative;
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+
+  @media (min-width: 769px) {
+    margin-left: 250px;
+    padding: 2rem;
+  }
 
   @media (max-width: 768px) {
-    margin-left: 0;
     padding: 1rem;
+    padding-top: 4rem; /* Add space for mobile menu button */
   }
 `;
 

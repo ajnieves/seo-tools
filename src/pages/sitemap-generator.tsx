@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import PageHead from '@/components/PageHead';
-import AboutSection from '@/components/AboutSection';
-import FAQSection from '@/components/FAQSection';
 import SitemapGenerator from '@/components/SitemapGenerator';
+import SitemapAboutSection from '@/components/SitemapAboutSection';
+import SitemapFAQSection from '@/components/SitemapFAQSection';
 
 const Container = styled.div`
   max-width: 800px;
@@ -24,8 +24,8 @@ export default function SitemapGeneratorPage() {
       <Container>
         <Title>XML Sitemap Generator</Title>
         <SitemapGenerator />
-        <AboutSection />
-        <FAQSection />
+        <SitemapAboutSection />
+        <SitemapFAQSection />
       </Container>
     </>
   );

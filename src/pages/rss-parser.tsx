@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import PageHead from '@/components/PageHead';
-import AboutSection from '@/components/AboutSection';
-import FAQSection from '@/components/FAQSection';
 import RSSParser from '@/components/RSSParser';
+import RSSAboutSection from '@/components/RSSAboutSection';
+import RSSFAQSection from '@/components/RSSFAQSection';
 
 const Container = styled.div`
   max-width: 800px;
@@ -24,8 +24,8 @@ export default function RSSParserPage() {
       <Container>
         <Title>RSS Feed Parser</Title>
         <RSSParser />
-        <AboutSection />
-        <FAQSection />
+        <RSSAboutSection />
+        <RSSFAQSection />
       </Container>
     </>
   );
