@@ -32,8 +32,7 @@ export default function PageHead({ page }: PageHeadProps) {
       <link rel="canonical" href={canonicalUrl} />
       
       {/* Favicon */}
-      <link rel="icon" type="image/png" href="/favicon.png" />
-      <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+      <link rel="icon" href="/favicon.svg" />
       <meta name="google-site-verification" content="[your-verification-code]" />
       
       {/* Open Graph / Facebook */}
@@ -41,14 +40,14 @@ export default function PageHead({ page }: PageHeadProps) {
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={metadata.title} />
       <meta property="og:description" content={metadata.description} />
-      <meta property="og:image" content={`${origin}/favicon.png`} />
+      <meta property="og:image" content={`${origin}/favicon.svg`} />
       
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={canonicalUrl} />
       <meta name="twitter:title" content={metadata.title} />
       <meta name="twitter:description" content={metadata.description} />
-      <meta name="twitter:image" content={`${origin}/favicon.png`} />
+      <meta name="twitter:image" content={`${origin}/favicon.svg`} />
 
       {/* Schema.org JSON-LD */}
       <script
