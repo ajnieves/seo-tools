@@ -154,7 +154,7 @@ export default function Calculator() {
   const [result3, setResult3] = useState<number | null>(null);
 
   const validateNumber = (value: string, fieldName: string): string => {
-    if (!value) return `${fieldName} is required`;
+    if (!value.trim()) return `${fieldName} is required`;
     const num = parseFloat(value);
     if (isNaN(num)) return 'Please enter a valid number';
     if (num < 0) return 'Please enter a positive number';
@@ -171,8 +171,11 @@ export default function Calculator() {
     setNumber1({ ...number1, error: numberError });
 
     if (!percentageError && !numberError) {
-      const result = (parseFloat(percentage1.value) / 100) * parseFloat(number1.value);
-      setResult1(result);
+      const percent = parseFloat(percentage1.value);
+      const num = parseFloat(number1.value);
+      const result = (percent / 100) * num;
+      // Round to 2 decimal places
+      setResult1(Math.round(result * 100) / 100);
     }
   };
 
@@ -186,13 +189,17 @@ export default function Calculator() {
     setTotal2({ ...total2, error: totalError });
 
     if (!numberError && !totalError) {
-      const totalNum = parseFloat(total2.value);
-      if (totalNum === 0) {
+      const num = parseFloat(number2.value);
+      const total = parseFloat(total2.value);
+      
+      if (total === 0) {
         setTotal2({ ...total2, error: 'Total cannot be zero' });
         return;
       }
-      const result = (parseFloat(number2.value) / totalNum) * 100;
-      setResult2(result);
+      
+      const result = (num / total) * 100;
+      // Round to 2 decimal places
+      setResult2(Math.round(result * 100) / 100);
     }
   };
 
@@ -207,11 +214,22 @@ export default function Calculator() {
 
     if (!numberError && !percentageError) {
       const baseNumber = parseFloat(number3.value);
-      const percentageChange = parseFloat(percentage3.value) / 100;
-      const result = isIncrease
-        ? baseNumber + baseNumber * percentageChange
-        : baseNumber - baseNumber * percentageChange;
-      setResult3(result);
+      const percentageChange = parseFloat(percentage3.value);
+      
+      if (baseNumber === 0) {
+        setNumber3({ ...number3, error: 'Starting value cannot be zero' });
+        return;
+      }
+
+      let result;
+      if (isIncrease) {
+        result = baseNumber * (1 + percentageChange / 100);
+      } else {
+        result = baseNumber * (1 - percentageChange / 100);
+      }
+      
+      // Round to 2 decimal places
+      setResult3(Math.round(result * 100) / 100);
     }
   };
 
@@ -248,7 +266,7 @@ export default function Calculator() {
             <Button type="submit">Calculate</Button>
             {result1 !== null && (
               <Result>
-                {percentage1.value}% of {number1.value} is {result1.toFixed(2)}
+                {percentage1.value}% of {number1.value} is {result1.toLocaleString()}
               </Result>
             )}
           </Form>
@@ -283,7 +301,7 @@ export default function Calculator() {
             <Button type="submit">Calculate</Button>
             {result2 !== null && (
               <Result>
-                {number2.value} is {result2.toFixed(2)}% of {total2.value}
+                {number2.value} is {result2.toLocaleString()}% of {total2.value}
               </Result>
             )}
           </Form>
@@ -338,7 +356,7 @@ export default function Calculator() {
             {result3 !== null && (
               <Result>
                 {number3.value} {isIncrease ? 'increased' : 'decreased'} by {percentage3.value}% is{' '}
-                {result3.toFixed(2)}
+                {result3.toLocaleString()}
               </Result>
             )}
           </Form>
