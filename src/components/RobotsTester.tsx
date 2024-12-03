@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import Button from './Button';
+import RobotsFetcher from './RobotsFetcher';
 
 interface TestResult {
   allowed: boolean;
@@ -205,17 +206,6 @@ export default function RobotsTester() {
     <TesterSection>
       <Form onSubmit={handleSubmit}>
         <FormGroup>
-          <Label htmlFor="robots-txt">Robots.txt Content</Label>
-          <TextArea
-            id="robots-txt"
-            value={robotsTxt}
-            onChange={(e) => setRobotsTxt(e.target.value)}
-            placeholder="User-agent: *&#10;Disallow: /private/&#10;Allow: /public/"
-            required
-          />
-        </FormGroup>
-
-        <FormGroup>
           <Label htmlFor="test-url">Test URL</Label>
           <Input
             id="test-url"
@@ -225,6 +215,23 @@ export default function RobotsTester() {
             placeholder="https://example.com/page-to-test"
             required
           />
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="robots-txt">Robots.txt Content</Label>
+          <div style={{ width: '100%' }}>
+            <TextArea
+              id="robots-txt"
+              value={robotsTxt}
+              onChange={(e) => setRobotsTxt(e.target.value)}
+              placeholder="User-agent: *&#10;Disallow: /private/&#10;Allow: /public/"
+              required
+            />
+            <RobotsFetcher 
+              url={url} 
+              onContentFetched={setRobotsTxt}
+            />
+          </div>
         </FormGroup>
 
         <FormGroup>
