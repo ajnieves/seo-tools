@@ -84,6 +84,20 @@ export const schema = {
     ]
   }),
 
+  articleEvaluator: (): object => ({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Article SEO Evaluator",
+    "applicationCategory": "SEO Tool",
+    "description": "Evaluate and improve your article's SEO by analyzing H1, meta title, and meta description with AI-powered recommendations.",
+    "featureList": [
+      "H1 Tag Analysis",
+      "Meta Title Optimization",
+      "Meta Description Evaluation",
+      "AI-Powered Recommendations"
+    ]
+  }),
+
   organization: (): object => ({
     "@context": "https://schema.org",
     "@type": "Organization",

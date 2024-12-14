@@ -1,0 +1,359 @@
+.container {
+  @apply w-full max-w-5xl mx-auto px-6 py-8 space-y-8 font-sans;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Search Section */
+.searchSection {
+  @apply max-w-3xl mx-auto mb-12 relative;
+}
+
+.searchSection::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 
+         rounded-2xl blur-3xl -z-10 opacity-50;
+}
+
+.searchBar {
+  @apply flex flex-col sm:flex-row gap-6 sm:items-start;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.inputGroup {
+  @apply flex-1 space-y-4;
+}
+
+/* Toggle Switch */
+.toggle {
+  @apply flex items-center gap-3 text-sm text-gray-300 cursor-pointer;
+}
+
+.toggleInput {
+  @apply sr-only;
+}
+
+.toggleLabel {
+  @apply relative pl-14 select-none hover:text-primary transition-colors duration-200;
+}
+
+.toggleLabel::before {
+  content: '';
+  @apply absolute left-0 top-1/2 -translate-y-1/2 w-12 h-6 
+         bg-gray-700/50 backdrop-blur-sm rounded-full 
+         transition-all duration-200 border border-gray-600/50;
+}
+
+.toggleLabel::after {
+  content: '';
+  @apply absolute left-0.5 top-1/2 -translate-y-1/2 w-5 h-5 
+         bg-gray-300 rounded-full transition-all duration-300
+         shadow-lg;
+}
+
+.toggleInput:checked + .toggleLabel::before {
+  @apply bg-primary/30 border-primary/50;
+}
+
+.toggleInput:checked + .toggleLabel::after {
+  @apply translate-x-6 bg-primary;
+}
+
+.toggleInput:focus + .toggleLabel::before {
+  @apply ring-2 ring-primary/30;
+}
+
+/* Input and Button */
+.input {
+  @apply w-full px-5 py-4 bg-gray-800/50 backdrop-blur-sm 
+         border border-gray-700/50 rounded-xl text-white
+         placeholder-gray-500 outline-none transition-all duration-200
+         text-base shadow-inner hover:bg-gray-800/70;
+  min-height: 52px;
+}
+
+.input:focus {
+  @apply border-primary/50 ring-2 ring-primary/20 bg-gray-800/80
+         shadow-lg shadow-primary/5;
+}
+
+.button {
+  @apply px-8 py-4 bg-primary text-black font-medium rounded-xl
+         transition-all duration-300 flex-shrink-0 flex items-center justify-center
+         disabled:opacity-50 disabled:cursor-not-allowed
+         text-base relative overflow-hidden;
+  min-height: 52px;
+  min-width: 140px;
+}
+
+.button::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0
+         translate-x-[-200%] transition-transform duration-500;
+}
+
+.button:hover:not(:disabled)::before {
+  @apply translate-x-[200%];
+}
+
+.button:hover:not(:disabled) {
+  @apply transform -translate-y-0.5 shadow-lg shadow-primary/20;
+}
+
+/* Loading State */
+.loadingState {
+  @apply flex justify-center items-center py-16;
+}
+
+/* Error Message */
+.error {
+  @apply flex items-center gap-3 p-5 bg-red-500/10 border border-red-500/20
+         text-red-400 rounded-xl max-w-3xl mx-auto mb-8 backdrop-blur-sm;
+}
+
+/* Results Section */
+.results {
+  @apply bg-gray-900/30 backdrop-blur-sm rounded-xl overflow-hidden
+         border border-gray-800/50 shadow-xl relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+.results::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent
+         pointer-events-none;
+}
+
+/* Tabs */
+.tabs {
+  @apply flex border-b border-gray-800/50 bg-gray-900/50 relative;
+}
+
+.tab {
+  @apply px-8 py-4 text-base font-medium text-gray-400 
+         transition-all duration-200 border-b-2 border-transparent
+         hover:text-gray-300 hover:bg-gray-800/30 relative;
+  min-width: 160px;
+}
+
+.activeTab {
+  @apply text-primary border-primary bg-gray-800/30;
+}
+
+.activeTab::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5
+         pointer-events-none opacity-50;
+}
+
+/* Table Styles */
+.table {
+  @apply w-full border-collapse relative;
+}
+
+/* Table Header */
+.table thead {
+  @apply bg-gray-800/30;
+}
+
+.table th {
+  @apply px-8 py-5 text-left text-xs font-medium text-gray-400 
+         uppercase tracking-wider;
+}
+
+.table tbody th {
+  @apply text-gray-300 font-medium;
+  width: 160px;
+}
+
+/* Table Body */
+.table td, .table tbody th {
+  @apply px-8 py-5 border-b border-gray-800/30 transition-colors duration-200;
+}
+
+.table tr:hover td,
+.table tr:hover th {
+  @apply bg-gray-800/20;
+}
+
+.table tr:last-child td,
+.table tr:last-child th {
+  @apply border-0;
+}
+
+/* Content Cells */
+.content {
+  @apply text-base break-words leading-relaxed;
+  min-height: 24px;
+}
+
+.current .content {
+  @apply text-gray-300;
+}
+
+.recommended .content {
+  @apply text-primary font-medium;
+}
+
+/* Meta Information */
+.metaInfo {
+  @apply text-xs mt-2.5 font-medium flex items-center gap-2;
+}
+
+.metaInfo::before {
+  content: '';
+  @apply w-1.5 h-1.5 rounded-full;
+}
+
+.success .metaInfo::before {
+  @apply bg-green-500;
+}
+
+.warning .metaInfo::before {
+  @apply bg-yellow-500;
+}
+
+.error .metaInfo::before {
+  @apply bg-red-500;
+}
+
+/* Sentiment Analysis */
+.sentiment {
+  @apply font-medium text-base capitalize flex items-center gap-2;
+  width: 180px;
+}
+
+.sentiment::before {
+  content: '';
+  @apply w-2 h-2 rounded-full;
+}
+
+.positive {
+  @apply text-green-500;
+}
+
+.positive::before {
+  @apply bg-green-500;
+}
+
+.neutral {
+  @apply text-blue-500;
+}
+
+.neutral::before {
+  @apply bg-blue-500;
+}
+
+.negative {
+  @apply text-red-500;
+}
+
+.negative::before {
+  @apply bg-red-500;
+}
+
+.explanation {
+  @apply text-gray-300 text-base leading-relaxed;
+}
+
+/* Section spacing */
+.section {
+  @apply p-6;
+}
+
+.section + .section {
+  @apply border-t border-gray-800/50;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4 py-6;
+  }
+
+  .searchSection {
+    @apply mb-8;
+  }
+
+  .searchBar {
+    @apply gap-6;
+  }
+
+  .table {
+    @apply block;
+  }
+
+  .table thead {
+    @apply hidden;
+  }
+
+  .table tbody {
+    @apply block;
+  }
+
+  .table tr {
+    @apply block border-b border-gray-800/30 p-5;
+  }
+
+  .table tr:last-child {
+    @apply border-0;
+  }
+
+  .table td, 
+  .table tbody th {
+    @apply block px-0 py-3 border-0;
+  }
+
+  .table tbody th {
+    @apply text-xs uppercase tracking-wider text-gray-400 pb-4;
+    width: auto;
+  }
+
+  .content {
+    @apply bg-gray-800/30 p-4 rounded-lg;
+  }
+
+  .metaInfo {
+    @apply mt-2 ml-1;
+  }
+
+  .sentiment {
+    @apply w-auto mb-3;
+  }
+
+  .tabs {
+    @apply overflow-x-auto;
+  }
+
+  .tab {
+    @apply flex-shrink-0 px-6 py-3;
+    min-width: 140px;
+  }
+
+  .section {
+    @apply p-4;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .results,
+  .toggleLabel::before,
+  .toggleLabel::after,
+  .tab,
+  .button::before {
+    animation: none;
+    transition: none;
+  }
+}

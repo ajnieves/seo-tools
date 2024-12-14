@@ -55,6 +55,13 @@ export const metadata: SiteMetadata = {
     canonicalUrl: `${BASE_URL}/percentage-calculator`,
     robots: 'index, follow'
   },
+  articleEvaluator: {
+    title: 'Article SEO Evaluator - Analyze and Optimize Content',
+    description: 'Evaluate and improve your article\'s SEO by analyzing H1, meta title, and meta description with AI-powered recommendations.',
+    keywords: ['article analysis', 'SEO evaluation', 'content optimization', 'meta tags', 'H1 optimization'],
+    canonicalUrl: `${BASE_URL}/article-evaluator`,
+    robots: 'index, follow'
+  }
 };
 
 export function getPageMetadata(page: keyof typeof metadata): PageMetadata {
