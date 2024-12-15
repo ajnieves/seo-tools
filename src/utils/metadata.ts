@@ -4,6 +4,13 @@ export interface PageMetadata {
   keywords: string[];
   canonicalUrl: string;
   robots: string;
+  tool?: {
+    name: string;
+    heading: string;
+    subheading: string;
+    features: string[];
+    benefits: string[];
+  };
 }
 
 interface SiteMetadata {
@@ -21,11 +28,47 @@ export const metadata: SiteMetadata = {
     robots: 'index, follow'
   },
   entityAnalyzer: {
-    title: 'Entity Analyzer - Extract and Analyze Named Entities',
-    description: 'Analyze web content to identify and extract named entities, understand key subjects, organizations, and locations.',
-    keywords: ['entity analysis', 'named entity recognition', 'content analysis', 'SEO analysis'],
+    title: 'Entity Analyzer - Extract and Analyze Named Entities | SEO Tools',
+    description: 'Extract named entities and analyze sentiment from any webpage using advanced natural language processing. Identify key people, organizations, and locations.',
+    keywords: [
+      'entity analysis',
+      'named entity recognition',
+      'sentiment analysis',
+      'content analysis',
+      'NLP',
+      'SEO analysis',
+      'text analysis',
+      'content optimization',
+      'entity extraction',
+      'semantic analysis'
+    ],
     canonicalUrl: `${BASE_URL}/entity-analyzer`,
-    robots: 'index, follow'
+    robots: 'index, follow',
+    tool: {
+      name: 'Entity Analyzer',
+      heading: 'Entity Analyzer',
+      subheading: 'Extract named entities and analyze sentiment from any webpage using advanced natural language processing.',
+      features: [
+        'Named Entity Recognition (NER)',
+        'Sentiment Analysis',
+        'Entity Type Classification',
+        'Relevance Scoring',
+        'Entity Relationship Analysis',
+        'Content Sentiment Evaluation',
+        'Entity Frequency Analysis',
+        'CSV Export Capability'
+      ],
+      benefits: [
+        'Understand key entities in your content',
+        'Analyze content sentiment and tone',
+        'Identify important people, organizations, and locations',
+        'Measure entity relevance and importance',
+        'Optimize content focus and targeting',
+        'Improve content quality and relevance',
+        'Better understand content relationships',
+        'Export data for further analysis'
+      ]
+    }
   },
   sitemapGenerator: {
     title: 'XML Sitemap Generator - Create SEO-friendly Sitemaps',
@@ -66,4 +109,8 @@ export const metadata: SiteMetadata = {
 
 export function getPageMetadata(page: keyof typeof metadata): PageMetadata {
   return metadata[page];
+}
+
+export function getToolMetadata(page: keyof typeof metadata): PageMetadata['tool'] | undefined {
+  return metadata[page]?.tool;
 }

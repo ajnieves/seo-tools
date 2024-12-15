@@ -1,0 +1,240 @@
+/* Base styles */
+.container {
+  @apply max-w-7xl mx-auto px-4 py-8;
+}
+
+.header {
+  @apply mb-12 text-center;
+}
+
+.title {
+  @apply text-4xl font-bold text-green-400 mb-4;
+}
+
+.subtitle {
+  @apply text-lg text-gray-400 max-w-2xl mx-auto;
+}
+
+/* Input section */
+.inputSection {
+  @apply bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-2xl p-8 backdrop-blur-sm border border-gray-700/50 mb-8;
+}
+
+.inputForm {
+  @apply max-w-3xl mx-auto;
+}
+
+.inputGroup {
+  @apply relative;
+}
+
+.input {
+  @apply w-full px-6 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500
+    focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500
+    transition-all duration-200;
+}
+
+.inputError {
+  @apply border-red-500 focus:ring-red-500/50 focus:border-red-500;
+}
+
+.button {
+  @apply w-full mt-4 px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700
+    text-white font-semibold rounded-xl transition-all duration-200
+    disabled:opacity-50 disabled:cursor-not-allowed
+    focus:outline-none focus:ring-2 focus:ring-green-500/50;
+}
+
+/* Results section */
+.results {
+  @apply space-y-6;
+}
+
+.resultsHeader {
+  @apply flex flex-col sm:flex-row justify-between items-center gap-4 mb-8;
+}
+
+.timestamp {
+  @apply text-sm text-gray-400;
+}
+
+.exportButton {
+  @apply px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors
+    border border-gray-700 hover:border-gray-600;
+}
+
+/* Stats grid */
+.statsGrid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
+}
+
+.statCard {
+  @apply bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-6 border border-gray-700/50;
+}
+
+.statLabel {
+  @apply text-sm text-gray-400 mb-2;
+}
+
+.statValue {
+  @apply text-2xl font-bold text-white;
+}
+
+.statTrend {
+  @apply flex items-center gap-2 mt-2 text-sm;
+}
+
+/* Entity type filters */
+.filters {
+  @apply flex flex-wrap gap-3 mb-8;
+}
+
+.filterButton {
+  @apply px-4 py-2 rounded-xl text-sm font-medium transition-colors;
+}
+
+.filterActive {
+  @apply bg-green-500 text-white;
+}
+
+.filterInactive {
+  @apply bg-gray-800 text-gray-300 hover:bg-gray-700;
+}
+
+/* Search bar */
+.searchBar {
+  @apply relative mb-8;
+}
+
+.searchInput {
+  @apply w-full px-6 py-4 pl-12 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500
+    focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500
+    transition-all duration-200;
+}
+
+.searchIcon {
+  @apply absolute left-4 top-1/2 -translate-y-1/2 text-gray-500;
+}
+
+/* Entity cards */
+.entityGrid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.entityCard {
+  @apply bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-6 border border-gray-700/50
+    hover:border-green-500/50 transition-all duration-200;
+}
+
+.entityHeader {
+  @apply flex justify-between items-start mb-4;
+}
+
+.entityName {
+  @apply text-lg font-semibold text-white;
+}
+
+.entityType {
+  @apply px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.entityStats {
+  @apply space-y-4;
+}
+
+.entityStat {
+  @apply flex justify-between items-center;
+}
+
+.entityStatLabel {
+  @apply text-sm text-gray-400;
+}
+
+.entityStatValue {
+  @apply text-sm font-medium text-white;
+}
+
+.progressBar {
+  @apply w-full h-2 bg-gray-700 rounded-full overflow-hidden mt-1;
+}
+
+.progressFill {
+  @apply h-full rounded-full transition-all duration-200;
+}
+
+/* Loading state */
+.loading {
+  @apply flex flex-col items-center justify-center py-12;
+}
+
+.loadingText {
+  @apply mt-4 text-gray-400;
+}
+
+/* Error state */
+.error {
+  @apply bg-red-900/20 border border-red-500/50 rounded-xl p-6 text-red-300 text-center;
+}
+
+/* Sentiment indicators */
+.sentimentPositive {
+  @apply text-green-400 bg-green-500/20;
+}
+
+.sentimentNegative {
+  @apply text-red-400 bg-red-500/20;
+}
+
+.sentimentNeutral {
+  @apply text-yellow-400 bg-yellow-500/20;
+}
+
+/* Entity type colors */
+.typePerson {
+  @apply text-blue-400 bg-blue-500/20 border-blue-500/50;
+}
+
+.typeOrganization {
+  @apply text-purple-400 bg-purple-500/20 border-purple-500/50;
+}
+
+.typeLocation {
+  @apply text-green-400 bg-green-500/20 border-green-500/50;
+}
+
+.typeMiscellaneous {
+  @apply text-gray-400 bg-gray-500/20 border-gray-500/50;
+}
+
+/* Animations */
+.fadeIn {
+  @apply animate-fadeIn;
+}
+
+.slideUp {
+  @apply animate-slideUp;
+}
+
+.pulse {
+  @apply animate-pulse;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

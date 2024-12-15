@@ -119,24 +119,43 @@ const BottomBar = styled.div`
 
 const tools = [
   {
-    name: 'Entity Analyzer',
-    href: '/entity-analyzer',
+    name: 'Content Analysis',
+    items: [
+      {
+        name: 'Article Evaluator',
+        href: '/article-evaluator',
+      },
+      {
+        name: 'Entity Analyzer',
+        href: '/entity-analyzer',
+      },
+    ],
   },
   {
-    name: 'XML Sitemap Generator',
-    href: '/sitemap-generator',
+    name: 'Technical SEO',
+    items: [
+      {
+        name: 'XML Sitemap Generator',
+        href: '/sitemap-generator',
+      },
+      {
+        name: 'RSS Feed Parser',
+        href: '/rss-parser',
+      },
+      {
+        name: 'Robots.txt Tester',
+        href: '/robots-tester',
+      },
+    ],
   },
   {
-    name: 'RSS Feed Parser',
-    href: '/rss-parser',
-  },
-  {
-    name: 'Robots.txt Tester',
-    href: '/robots-tester',
-  },
-  {
-    name: 'Percentage Calculator',
-    href: '/percentage-calculator',
+    name: 'Utilities',
+    items: [
+      {
+        name: 'Percentage Calculator',
+        href: '/percentage-calculator',
+      },
+    ],
   },
 ];
 
@@ -151,27 +170,29 @@ export default function Footer() {
           </FooterText>
         </FooterSection>
 
-        <FooterSection>
-          <SectionTitle>Tools</SectionTitle>
-          {tools.map((tool) => (
-            <Link key={tool.href} href={tool.href} passHref legacyBehavior>
-              <StyledLink>
-                {tool.name}
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </StyledLink>
-            </Link>
-          ))}
-        </FooterSection>
+        {tools.map((section) => (
+          <FooterSection key={section.name}>
+            <SectionTitle>{section.name}</SectionTitle>
+            {section.items.map((tool) => (
+              <Link key={tool.href} href={tool.href} passHref legacyBehavior>
+                <StyledLink>
+                  {tool.name}
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </StyledLink>
+              </Link>
+            ))}
+          </FooterSection>
+        ))}
       </FooterContent>
 
       <BottomBar>

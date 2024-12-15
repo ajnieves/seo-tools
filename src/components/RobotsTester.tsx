@@ -3,6 +3,17 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import Button from './Button';
 import RobotsFetcher from './RobotsFetcher';
+import {
+  Container,
+  Card,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  TextArea,
+  Select,
+  ErrorMessage
+} from './shared/StyledComponents';
 
 interface TestResult {
   allowed: boolean;
@@ -10,158 +21,50 @@ interface TestResult {
   explanation: string;
 }
 
-const TesterSection = styled.div`
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  grid-column: 1 / -1;
-
-  @media (min-width: 768px) {
-    padding: 2rem;
-  }
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  @media (min-width: 480px) {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-`;
-
-const Label = styled.label`
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  min-width: 120px;
-  flex-shrink: 0;
-`;
-
-const Input = styled.input`
-  padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
-  width: 100%;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #00a8e8;
-    box-shadow: 0 0 0 2px rgba(0, 168, 232, 0.2);
-  }
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-  }
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
-  width: 100%;
-  min-height: 200px;
-  resize: vertical;
-  font-family: monospace;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #00a8e8;
-    box-shadow: 0 0 0 2px rgba(0, 168, 232, 0.2);
-  }
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-  }
-`;
-
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
-  width: 100%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #00a8e8;
-    box-shadow: 0 0 0 2px rgba(0, 168, 232, 0.2);
-  }
-
-  option {
-    background: #1a1a2e;
-    color: white;
-  }
-`;
-
-const ResultContainer = styled.div<{ allowed: boolean }>`
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border-radius: 12px;
+const ResultContainer = styled(Card)<{ allowed: boolean }>`
+  margin-top: var(--space-6);
   background: ${props => props.allowed 
-    ? 'rgba(0, 255, 157, 0.1)'
-    : 'rgba(255, 77, 77, 0.1)'};
+    ? 'rgba(0, 229, 176, 0.1)'
+    : 'rgba(239, 68, 68, 0.1)'};
   border: 1px solid ${props => props.allowed
-    ? 'rgba(0, 255, 157, 0.2)'
-    : 'rgba(255, 77, 77, 0.2)'};
+    ? 'var(--success-color)'
+    : 'var(--error-color)'};
 `;
 
 const ResultTitle = styled.h3<{ allowed: boolean }>`
-  color: ${props => props.allowed ? '#00ff9d' : '#ff4d4d'};
+  color: ${props => props.allowed ? 'var(--success-color)' : 'var(--error-color)'};
   font-size: 1.2rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 `;
 
 const ResultDetails = styled.div`
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-color);
   font-size: 0.9rem;
   line-height: 1.6;
 
   code {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
+    background: var(--surface-hover);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
     font-family: monospace;
+  }
+
+  p {
+    margin-bottom: var(--space-2);
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 `;
 
-const ErrorMessage = styled.div`
-  color: #ff4d4d;
-  padding: 1rem;
-  border: 1px solid rgba(255, 77, 77, 0.2);
-  border-radius: 12px;
-  background: rgba(255, 77, 77, 0.1);
-  margin-top: 1rem;
+const TextAreaWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 `;
 
 export default function RobotsTester() {
@@ -203,84 +106,84 @@ export default function RobotsTester() {
   };
 
   return (
-    <TesterSection>
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label htmlFor="test-url">Test URL</Label>
-          <Input
-            id="test-url"
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com/page-to-test"
-            required
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="robots-txt">Robots.txt Content</Label>
-          <div style={{ width: '100%' }}>
-            <TextArea
-              id="robots-txt"
-              value={robotsTxt}
-              onChange={(e) => setRobotsTxt(e.target.value)}
-              placeholder="User-agent: *&#10;Disallow: /private/&#10;Allow: /public/"
-              required
-            />
-            <RobotsFetcher 
-              url={url} 
-              onContentFetched={setRobotsTxt}
-            />
-          </div>
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="user-agent">User Agent</Label>
-          <Select
-            id="user-agent"
-            value={userAgent}
-            onChange={(e) => setUserAgent(e.target.value)}
-          >
-            <option value="Googlebot">Googlebot</option>
-            <option value="Bingbot">Bingbot</option>
-            <option value="Baiduspider">Baiduspider</option>
-            <option value="*">All robots (*)</option>
-            <option value="custom">Custom</option>
-          </Select>
-        </FormGroup>
-
-        {userAgent === 'custom' && (
+    <Container>
+      <Card>
+        <Form onSubmit={handleSubmit}>
           <FormGroup>
-            <Label htmlFor="custom-agent">Custom Agent</Label>
+            <Label htmlFor="test-url">Test URL</Label>
             <Input
-              id="custom-agent"
-              type="text"
-              placeholder="Enter custom user agent"
+              id="test-url"
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://example.com/page-to-test"
               required
             />
           </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="robots-txt">Robots.txt Content</Label>
+            <TextAreaWrapper>
+              <TextArea
+                id="robots-txt"
+                value={robotsTxt}
+                onChange={(e) => setRobotsTxt(e.target.value)}
+                placeholder="User-agent: *&#10;Disallow: /private/&#10;Allow: /public/"
+                required
+              />
+              <RobotsFetcher 
+                url={url} 
+                onContentFetched={setRobotsTxt}
+              />
+            </TextAreaWrapper>
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="user-agent">User Agent</Label>
+            <Select
+              id="user-agent"
+              value={userAgent}
+              onChange={(e) => setUserAgent(e.target.value)}
+            >
+              <option value="Googlebot">Googlebot</option>
+              <option value="Bingbot">Bingbot</option>
+              <option value="Baiduspider">Baiduspider</option>
+              <option value="*">All robots (*)</option>
+              <option value="custom">Custom</option>
+            </Select>
+          </FormGroup>
+
+          {userAgent === 'custom' && (
+            <FormGroup>
+              <Label htmlFor="custom-agent">Custom Agent</Label>
+              <Input
+                id="custom-agent"
+                type="text"
+                placeholder="Enter custom user agent"
+                required
+              />
+            </FormGroup>
+          )}
+
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Testing...' : 'Test Access'}
+          </Button>
+        </Form>
+
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+
+        {result && (
+          <ResultContainer allowed={result.allowed}>
+            <ResultTitle allowed={result.allowed}>
+              {result.allowed ? '✓ URL is Allowed' : '✕ URL is Blocked'}
+            </ResultTitle>
+            <ResultDetails>
+              <p><strong>Matched Rule:</strong> <code>{result.matchedRule}</code></p>
+              <p>{result.explanation}</p>
+            </ResultDetails>
+          </ResultContainer>
         )}
-
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Testing...' : 'Test Access'}
-        </Button>
-      </Form>
-
-      {error && (
-        <ErrorMessage>{error}</ErrorMessage>
-      )}
-
-      {result && (
-        <ResultContainer allowed={result.allowed}>
-          <ResultTitle allowed={result.allowed}>
-            {result.allowed ? '✓ URL is Allowed' : '✕ URL is Blocked'}
-          </ResultTitle>
-          <ResultDetails>
-            <p><strong>Matched Rule:</strong> <code>{result.matchedRule}</code></p>
-            <p>{result.explanation}</p>
-          </ResultDetails>
-        </ResultContainer>
-      )}
-    </TesterSection>
+      </Card>
+    </Container>
   );
 }

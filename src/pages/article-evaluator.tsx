@@ -1,26 +1,35 @@
-import React from 'react';
-import PageHead from '../components/PageHead';
-import ArticleEvaluator from '../components/ArticleEvaluator';
-import { MainContent, ContentWrapper } from '../components/StyledLayout';
+'use client';
+import styled from '@emotion/styled';
+import PageHead from '@/components/PageHead';
+import ArticleEvaluator from '@/components/ArticleEvaluator';
+import ArticleHowItWorks from '@/components/ArticleHowItWorks';
+import ArticleFAQ from '@/components/ArticleFAQ';
+import { Container } from '@/components/shared/StyledComponents';
 
-const ArticleEvaluatorPage: React.FC = () => {
+const Title = styled.h1`
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: var(--space-6);
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const ContentContainer = styled(Container)`
+  max-width: 1200px;
+`;
+
+export default function ArticleEvaluatorPage() {
   return (
     <>
       <PageHead page="articleEvaluator" />
-      <MainContent>
-        <ContentWrapper>
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">Article SEO Evaluator</h1>
-            <p className="mb-8 text-gray-600">
-              Enter a URL to analyze your article's H1 tag, meta title, and meta description. 
-              Get AI-powered recommendations to improve your on-page SEO elements.
-            </p>
-            <ArticleEvaluator />
-          </div>
-        </ContentWrapper>
-      </MainContent>
+      <ContentContainer>
+        <Title>Article SEO Evaluator</Title>
+        <ArticleEvaluator />
+        <ArticleHowItWorks />
+        <ArticleFAQ />
+      </ContentContainer>
     </>
   );
-};
-
-export default ArticleEvaluatorPage;
+}

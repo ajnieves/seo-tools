@@ -1,6 +1,16 @@
+'use client';
 import React, { useState } from 'react';
+import styled from '@emotion/styled';
 import LoadingSpinner from './LoadingSpinner';
-import styles from '../styles/ArticleEvaluator.module.css';
+import {
+  Container,
+  Card,
+  Form,
+  FormGroup,
+  Input,
+  ErrorMessage,
+  LoadingContainer
+} from './shared/StyledComponents';
 
 interface EvaluationResult {
   currentH1: string;
@@ -17,7 +27,121 @@ interface EvaluationResult {
 
 type TabType = 'seo' | 'sentiment';
 
-const ArticleEvaluator: React.FC = () => {
+const SearchBar = styled.div`
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  flex-direction: column;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+`;
+
+const InputGroup = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+`;
+
+const Toggle = styled.label`
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  input {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+  }
+`;
+
+const Tabs = styled.div`
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border-color);
+`;
+
+const Tab = styled.button<{ active: boolean }>`
+  padding: var(--space-3) var(--space-4);
+  color: ${props => props.active ? 'var(--primary-color)' : 'var(--text-color)'};
+  border-bottom: 2px solid ${props => props.active ? 'var(--primary-color)' : 'transparent'};
+  background: none;
+  font-weight: ${props => props.active ? '600' : '400'};
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--primary-color);
+  }
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-4);
+
+  th, td {
+    padding: var(--space-4);
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+
+  th {
+    background: var(--surface-hover);
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  td {
+    vertical-align: top;
+  }
+`;
+
+const Content = styled.div`
+  margin-bottom: var(--space-2);
+`;
+
+const MetaInfo = styled.div<{ status: 'success' | 'warning' | 'error' }>`
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: ${props => {
+    switch (props.status) {
+      case 'success': return 'var(--success-color)';
+      case 'warning': return 'var(--warning-color)';
+      case 'error': return 'var(--error-color)';
+      default: return 'var(--text-color)';
+    }
+  }};
+  background: ${props => {
+    switch (props.status) {
+      case 'success': return 'rgba(16, 185, 129, 0.1)';
+      case 'warning': return 'rgba(245, 158, 11, 0.1)';
+      case 'error': return 'rgba(239, 68, 68, 0.1)';
+      default: return 'var(--surface-hover)';
+    }
+  }};
+`;
+
+const SentimentCell = styled.td<{ type: string }>`
+  color: ${props => {
+    switch (props.type) {
+      case 'positive': return 'var(--success-color)';
+      case 'negative': return 'var(--error-color)';
+      default: return 'var(--text-color)';
+    }
+  }};
+  font-weight: 600;
+  text-transform: capitalize;
+`;
+
+export default function ArticleEvaluator() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EvaluationResult | null>(null);
@@ -32,7 +156,6 @@ const ArticleEvaluator: React.FC = () => {
     setResult(null);
 
     try {
-      console.log('Submitting request:', { url, includeSentiment });
       const response = await fetch('/api/evaluate-article', {
         method: 'POST',
         headers: {
@@ -42,7 +165,6 @@ const ArticleEvaluator: React.FC = () => {
       });
 
       const data = await response.json();
-      console.log('API Response:', data);
 
       if (!response.ok) {
         throw new Error(data.error || data.details || 'Failed to evaluate article');
@@ -50,14 +172,13 @@ const ArticleEvaluator: React.FC = () => {
 
       setResult(data);
     } catch (err: any) {
-      console.error('Error in handleSubmit:', err);
       setError(err.message || 'Failed to evaluate article. Please check the URL and try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatus = (text: string, min: number, max: number) => {
+  const getStatus = (text: string, min: number, max: number): 'success' | 'warning' | 'error' => {
     const count = text.length;
     if (count < min) return 'warning';
     if (count > max) return 'error';
@@ -69,195 +190,136 @@ const ArticleEvaluator: React.FC = () => {
     return `${count}/${max}`;
   };
 
-  const getSentimentColor = (type: string) => {
-    switch (type) {
-      case 'positive':
-        return styles.positive;
-      case 'negative':
-        return styles.negative;
-      default:
-        return styles.neutral;
-    }
-  };
-
   return (
-    <main className={styles.container} role="main">
-      <div className={styles.searchSection}>
-        <form onSubmit={handleSubmit} aria-label="URL evaluation form">
-          <div className={styles.searchBar}>
-            <div className={styles.inputGroup}>
-              <input
+    <Container>
+      <Card>
+        <Form onSubmit={handleSubmit}>
+          <SearchBar>
+            <InputGroup>
+              <Input
                 type="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="Enter article URL"
                 required
-                className={styles.input}
-                aria-label="Article URL"
               />
-              <label className={styles.toggle}>
+              <Toggle>
                 <input
                   type="checkbox"
                   checked={includeSentiment}
                   onChange={(e) => setIncludeSentiment(e.target.checked)}
-                  className={styles.toggleInput}
                 />
-                <span className={styles.toggleLabel}>Include Sentiment Analysis</span>
-              </label>
-            </div>
-            <button
-              type="submit"
-              disabled={loading || !url.trim()}
-              className={styles.button}
-              aria-busy={loading}
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <LoadingSpinner size="16px" inline hideText />
-                  <span>Analyzing</span>
-                </span>
-              ) : (
-                'Analyze'
-              )}
+                Include Sentiment Analysis
+              </Toggle>
+            </InputGroup>
+            <button type="submit" disabled={loading || !url.trim()}>
+              {loading ? 'Analyzing...' : 'Analyze'}
             </button>
-          </div>
-        </form>
-      </div>
+          </SearchBar>
+        </Form>
 
-      {loading && (
-        <div className={styles.loadingState} role="status">
-          <LoadingSpinner text="Analyzing article metadata..." size="32px" />
-        </div>
-      )}
+        {loading && (
+          <LoadingContainer>
+            <LoadingSpinner />
+            <p>Analyzing article metadata...</p>
+          </LoadingContainer>
+        )}
 
-      {error && (
-        <div className={styles.error} role="alert">
-          <span aria-hidden="true">⚠</span>
-          {error}
-        </div>
-      )}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {result && (
-        <div className={styles.results} role="region" aria-label="Analysis Results">
-          <div className={styles.tabs}>
-            <button
-              className={`${styles.tab} ${activeTab === 'seo' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('seo')}
-              aria-selected={activeTab === 'seo'}
-              role="tab"
-            >
-              SEO Analysis
-            </button>
-            {includeSentiment && result.sentiment && (
-              <button
-                className={`${styles.tab} ${activeTab === 'sentiment' ? styles.activeTab : ''}`}
-                onClick={() => setActiveTab('sentiment')}
-                aria-selected={activeTab === 'sentiment'}
-                role="tab"
+        {result && (
+          <>
+            <Tabs>
+              <Tab
+                active={activeTab === 'seo'}
+                onClick={() => setActiveTab('seo')}
               >
-                Sentiment Analysis
-              </button>
-            )}
-          </div>
+                SEO Analysis
+              </Tab>
+              {includeSentiment && result.sentiment && (
+                <Tab
+                  active={activeTab === 'sentiment'}
+                  onClick={() => setActiveTab('sentiment')}
+                >
+                  Sentiment Analysis
+                </Tab>
+              )}
+            </Tabs>
 
-          {activeTab === 'seo' && (
-            <div className={styles.section} role="tabpanel">
-              <table className={styles.table}>
+            {activeTab === 'seo' && (
+              <Table>
                 <thead>
                   <tr>
-                    <th scope="col">Element</th>
-                    <th scope="col">Current</th>
-                    <th scope="col">Recommended</th>
+                    <th>Element</th>
+                    <th>Current</th>
+                    <th>Recommended</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {/* H1 Row */}
                   <tr>
-                    <th scope="row">H1</th>
-                    <td className={styles.current}>
-                      <div className={styles.content}>
-                        {result.currentH1 || 'Not found'}
-                      </div>
+                    <th>H1</th>
+                    <td>
+                      <Content>{result.currentH1 || 'Not found'}</Content>
                     </td>
-                    <td className={styles.recommended}>
-                      <div className={styles.content}>
-                        {result.recommendedH1}
-                      </div>
+                    <td>
+                      <Content>{result.recommendedH1}</Content>
                     </td>
                   </tr>
-
-                  {/* Meta Title Row */}
                   <tr>
-                    <th scope="row">Meta Title</th>
-                    <td className={styles.current}>
-                      <div className={styles.content}>
-                        {result.currentMetaTitle || 'Not found'}
-                      </div>
-                      <div className={`${styles.metaInfo} ${styles[getStatus(result.currentMetaTitle, 50, 60)]}`}>
+                    <th>Meta Title</th>
+                    <td>
+                      <Content>{result.currentMetaTitle || 'Not found'}</Content>
+                      <MetaInfo status={getStatus(result.currentMetaTitle, 50, 60)}>
                         {getStatusText(result.currentMetaTitle, 50, 60)}
-                      </div>
+                      </MetaInfo>
                     </td>
-                    <td className={styles.recommended}>
-                      <div className={styles.content}>
-                        {result.recommendedMetaTitle}
-                      </div>
-                      <div className={`${styles.metaInfo} ${styles[getStatus(result.recommendedMetaTitle, 50, 60)]}`}>
+                    <td>
+                      <Content>{result.recommendedMetaTitle}</Content>
+                      <MetaInfo status={getStatus(result.recommendedMetaTitle, 50, 60)}>
                         {getStatusText(result.recommendedMetaTitle, 50, 60)}
-                      </div>
+                      </MetaInfo>
                     </td>
                   </tr>
-
-                  {/* Meta Description Row */}
                   <tr>
-                    <th scope="row">Meta Description</th>
-                    <td className={styles.current}>
-                      <div className={styles.content}>
-                        {result.currentMetaDescription || 'Not found'}
-                      </div>
-                      <div className={`${styles.metaInfo} ${styles[getStatus(result.currentMetaDescription, 150, 160)]}`}>
+                    <th>Meta Description</th>
+                    <td>
+                      <Content>{result.currentMetaDescription || 'Not found'}</Content>
+                      <MetaInfo status={getStatus(result.currentMetaDescription, 150, 160)}>
                         {getStatusText(result.currentMetaDescription, 150, 160)}
-                      </div>
+                      </MetaInfo>
                     </td>
-                    <td className={styles.recommended}>
-                      <div className={styles.content}>
-                        {result.recommendedMetaDescription}
-                      </div>
-                      <div className={`${styles.metaInfo} ${styles[getStatus(result.recommendedMetaDescription, 150, 160)]}`}>
+                    <td>
+                      <Content>{result.recommendedMetaDescription}</Content>
+                      <MetaInfo status={getStatus(result.recommendedMetaDescription, 150, 160)}>
                         {getStatusText(result.recommendedMetaDescription, 150, 160)}
-                      </div>
+                      </MetaInfo>
                     </td>
                   </tr>
                 </tbody>
-              </table>
-            </div>
-          )}
+              </Table>
+            )}
 
-          {activeTab === 'sentiment' && result.sentiment && (
-            <div className={styles.section} role="tabpanel">
-              <table className={styles.table}>
+            {activeTab === 'sentiment' && result.sentiment && (
+              <Table>
                 <thead>
                   <tr>
-                    <th scope="col">Sentiment</th>
-                    <th scope="col">Explanation</th>
+                    <th>Sentiment</th>
+                    <th>Explanation</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className={`${styles.sentiment} ${getSentimentColor(result.sentiment.type)}`}>
+                    <SentimentCell type={result.sentiment.type}>
                       {result.sentiment.type}
-                    </td>
-                    <td className={styles.explanation}>
-                      {result.sentiment.explanation}
-                    </td>
+                    </SentimentCell>
+                    <td>{result.sentiment.explanation}</td>
                   </tr>
                 </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-    </main>
+              </Table>
+            )}
+          </>
+        )}
+      </Card>
+    </Container>
   );
-};
-
-export default ArticleEvaluator;
+}

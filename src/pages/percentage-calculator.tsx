@@ -1,32 +1,35 @@
+'use client';
 import styled from '@emotion/styled';
 import PageHead from '@/components/PageHead';
 import Calculator from '@/components/Calculator';
-import CalculatorAboutSection from '@/components/CalculatorAboutSection';
-import CalculatorFAQSection from '@/components/CalculatorFAQSection';
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
+import CalculatorHowItWorks from '@/components/CalculatorHowItWorks';
+import CalculatorFAQ from '@/components/CalculatorFAQ';
+import { Container } from '@/components/shared/StyledComponents';
 
 const Title = styled.h1`
   color: var(--primary-color);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-6);
   font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const ContentContainer = styled(Container)`
+  max-width: 1200px;
 `;
 
 export default function PercentageCalculatorPage() {
   return (
     <>
       <PageHead page="percentageCalculator" />
-      
-      <Container>
+      <ContentContainer>
         <Title>Percentage Calculator</Title>
         <Calculator />
-        <CalculatorAboutSection />
-        <CalculatorFAQSection />
-      </Container>
+        <CalculatorHowItWorks />
+        <CalculatorFAQ />
+      </ContentContainer>
     </>
   );
 }

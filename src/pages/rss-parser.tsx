@@ -1,32 +1,35 @@
+'use client';
 import styled from '@emotion/styled';
 import PageHead from '@/components/PageHead';
 import RSSParser from '@/components/RSSParser';
-import RSSAboutSection from '@/components/RSSAboutSection';
-import RSSFAQSection from '@/components/RSSFAQSection';
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
+import RSSHowItWorks from '@/components/RSSHowItWorks';
+import RSSFAQ from '@/components/RSSFAQ';
+import { Container } from '@/components/shared/StyledComponents';
 
 const Title = styled.h1`
   color: var(--primary-color);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-6);
   font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const ContentContainer = styled(Container)`
+  max-width: 900px;
 `;
 
 export default function RSSParserPage() {
   return (
     <>
       <PageHead page="rssParser" />
-      
-      <Container>
+      <ContentContainer>
         <Title>RSS Feed Parser</Title>
         <RSSParser />
-        <RSSAboutSection />
-        <RSSFAQSection />
-      </Container>
+        <RSSHowItWorks />
+        <RSSFAQ />
+      </ContentContainer>
     </>
   );
 }
