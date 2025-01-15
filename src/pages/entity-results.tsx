@@ -64,7 +64,10 @@ export default function EntityResultsPage() {
 
   return (
     <>
-      <PageHead page="entityAnalyzer" />
+      <PageHead 
+        title="Entity Analysis Results - Named Entity Recognition"
+        description="View detailed results of your content's named entity analysis. Discover key entities, relationships, and insights from your text."
+      />
       <ContentContainer>
         <Title>Entity Analysis Results</Title>
         

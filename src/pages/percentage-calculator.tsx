@@ -23,7 +23,10 @@ const ContentContainer = styled(Container)`
 export default function PercentageCalculatorPage() {
   return (
     <>
-      <PageHead page="percentageCalculator" />
+      <PageHead 
+        title="Percentage Calculator - Calculate Percentage Changes"
+        description="Easy-to-use percentage calculator. Calculate percentage increases, decreases, differences, and more with our simple yet powerful tool."
+      />
       <ContentContainer>
         <Title>Percentage Calculator</Title>
         <Calculator />

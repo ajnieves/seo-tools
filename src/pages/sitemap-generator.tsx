@@ -23,7 +23,10 @@ const ContentContainer = styled(Container)`
 export default function SitemapGeneratorPage() {
   return (
     <>
-      <PageHead page="sitemapGenerator" />
+      <PageHead 
+        title="XML Sitemap Generator - Create SEO-friendly Sitemaps"
+        description="Generate XML sitemaps for your website to help search engines better understand and index your content structure. Improve your site's SEO."
+      />
       <ContentContainer>
         <Title>XML Sitemap Generator</Title>
         <SitemapGenerator />

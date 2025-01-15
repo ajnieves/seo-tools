@@ -23,7 +23,10 @@ const ContentContainer = styled(Container)`
 export default function ArticleEvaluatorPage() {
   return (
     <>
-      <PageHead page="articleEvaluator" />
+      <PageHead 
+        title="Article SEO Evaluator - Analyze Your Content"
+        description="Evaluate your article's SEO performance with our comprehensive analysis tool. Get insights on readability, keyword usage, and content optimization."
+      />
       <ContentContainer>
         <Title>Article SEO Evaluator</Title>
         <ArticleEvaluator />

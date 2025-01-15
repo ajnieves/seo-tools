@@ -127,10 +127,14 @@ function getRelationshipText(type: string): string {
   }
 }
 
-export default function EntityAnalyzer() {
+interface EntityAnalyzerProps {
+  initialResult?: any;
+}
+
+export default function EntityAnalyzer({ initialResult }: EntityAnalyzerProps) {
   const [filterType, setFilterType] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<any>(initialResult || null);
 
   const handleExport = () => {
     if (!result?.entities) return;
