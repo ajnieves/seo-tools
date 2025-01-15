@@ -1,104 +1,61 @@
 'use client';
-import React, { useState, useMemo, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from '@emotion/styled';
-import LoadingSpinner from './LoadingSpinner';
 import SearchTools from './SearchTools';
 import SentimentCard from './SentimentCard';
-import { Entity, AnalysisResult } from '@/types/analysis';
-import {
-  Container,
-  Card,
-  Grid,
-  Form,
-  FormGroup,
-  Input,
-  ErrorMessage,
-  LoadingContainer
-} from './shared/StyledComponents';
-
-interface StyledProps {
-  active?: boolean;
-  type: string;
-}
-
-const SearchSection = styled.div`
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
-  padding: var(--space-6);
-  margin-bottom: var(--space-6);
-`;
-
-const ResultsSection = styled(Card)`
-  padding: var(--space-6);
-`;
-
-const EntityTypeCard = styled(Card)<StyledProps>`
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: ${props => props.active ? `${getTypeColor(props.type)}10` : 'var(--surface-color)'};
-  border-color: ${props => props.active ? getTypeColor(props.type) : 'var(--border-color)'};
-
-  &:hover {
-    border-color: ${props => getTypeColor(props.type)};
-    transform: translateY(-2px);
-  }
-`;
+import { Entity, EntityRelationship } from '@/types/analysis';
+import { Container, Card, Grid, ErrorMessage } from './shared/StyledComponents';
 
 const EntityCard = styled(Card)`
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  
-  &:hover {
-    border-color: var(--primary-color);
-  }
+  padding: var(--space-4);
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
 `;
 
 const EntityHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: center;
   margin-bottom: var(--space-2);
 `;
 
 const EntityName = styled.h3`
+  margin: 0;
   color: var(--text-color);
-  font-size: 1.125rem;
-  font-weight: 600;
 `;
 
-const EntityType = styled.span<StyledProps>`
+const EntityType = styled.span`
   padding: var(--space-1) var(--space-3);
+  background: var(--primary-light);
+  color: var(--primary-color);
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: ${props => getTypeColor(props.type)};
-  background: ${props => `${getTypeColor(props.type)}20`};
+  font-size: 0.875rem;
 `;
 
 const EntityStats = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 `;
 
 const StatRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--text-color);
+  padding: var(--space-2);
+  background: var(--surface-hover);
+  border-radius: var(--radius-lg);
 `;
 
 const ProgressBar = styled.div`
   width: 100%;
-  height: 8px;
+  height: 4px;
   background: var(--surface-hover);
   border-radius: var(--radius-full);
-  overflow: hidden;
-  margin-top: var(--space-2);
+  margin-top: var(--space-1);
 
-  div {
+  > div {
     height: 100%;
     background: var(--primary-color);
     border-radius: var(--radius-full);
@@ -106,76 +63,86 @@ const ProgressBar = styled.div`
   }
 `;
 
-function getTypeColor(type: string): string {
+const RelationshipList = styled.div`
+  margin-top: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+`;
+
+const RelationshipItem = styled.div<{ type: string }>`
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: ${props => getRelationshipColor(props.type)};
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+
+  .context {
+    color: var(--text-secondary);
+    margin-left: var(--space-2);
+  }
+`;
+
+const RelationshipIcon = styled.span`
+  font-size: 1.25rem;
+`;
+
+function getRelationshipColor(type: string): string {
   switch (type) {
-    case 'PERSON': return 'var(--primary-color)';
-    case 'ORGANIZATION': return 'var(--info-color)';
-    case 'LOCATION': return 'var(--warning-color)';
-    default: return 'var(--text-secondary)';
+    case 'executive':
+      return 'rgba(0, 229, 176, 0.1)';
+    case 'incident':
+      return 'rgba(255, 99, 71, 0.1)';
+    case 'movement':
+      return 'rgba(64, 224, 208, 0.1)';
+    default:
+      return 'var(--surface-hover)';
+  }
+}
+
+function getRelationshipIcon(type: string): string {
+  switch (type) {
+    case 'executive':
+      return '👔';
+    case 'incident':
+      return '⚠️';
+    case 'movement':
+      return '🔄';
+    default:
+      return '🔗';
+  }
+}
+
+function getRelationshipText(type: string): string {
+  switch (type) {
+    case 'executive':
+      return 'Executive of';
+    case 'incident':
+      return 'Involved in incident with';
+    case 'movement':
+      return 'Movement related to';
+    default:
+      return 'Related to';
   }
 }
 
 export default function EntityAnalyzer() {
-  const [url, setUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-
-  const validateUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateUrl(url)) {
-      setError('Please enter a valid URL (e.g., https://example.com)');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const response = await fetch('/api/entity-analysis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to analyze URL');
-      }
-
-      const data = await response.json();
-      setResult(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [result, setResult] = useState<any>(null);
 
   const handleExport = () => {
     if (!result?.entities) return;
 
-    // Create CSV content
-    const headers = ['Name', 'Type', 'Relevance (%)', 'Mentions'];
+    const headers = ['Name', 'Type', 'Relevance (%)', 'Mentions', 'Category', 'Relationships'];
     const rows = filteredEntities.map(entity => [
       entity.name,
       entity.type,
       (entity.salience * 100).toFixed(1),
-      entity.mentions
+      entity.mentions,
+      entity.category || '',
+      entity.relationships?.map((r: EntityRelationship) => `${r.entity} (${r.type})`).join('; ') || ''
     ]);
 
     const csvContent = [
@@ -183,7 +150,6 @@ export default function EntityAnalyzer() {
       ...rows.map(row => row.join(','))
     ].join('\n');
 
-    // Create and download file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -196,45 +162,10 @@ export default function EntityAnalyzer() {
     URL.revokeObjectURL(url);
   };
 
-  const cleanEntityName = (name: string): string => {
-    if (name.includes('Stephanop') || name.includes('Stephanopou')) {
-      return 'George Stephanopoulos';
-    }
-    if (name === 'Trump' || name === 'DonaldTrump' || name === 'DonaldJ.Trump') {
-      return 'Donald Trump';
-    }
-    
-    if (name.includes('News')) {
-      return name.replace(/([A-Z])/g, ' $1').trim()
-        .replace(/\s+News/g, ' News')
-        .replace(/\s+Digital/g, ' Digital');
-    }
-    
-    return name
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
-      .trim();
-  };
-
   const filteredEntities = useMemo(() => {
     if (!result?.entities) return [];
 
-    let entities = [...result.entities]
-      .map(entity => ({
-        ...entity,
-        name: cleanEntityName(entity.name)
-      }))
-      .reduce((acc: Entity[], curr) => {
-        const existing = acc.find(e => e.name === curr.name && e.type === curr.type);
-        if (existing) {
-          existing.mentions += curr.mentions;
-          existing.salience = Math.max(existing.salience, curr.salience);
-        } else {
-          acc.push(curr);
-        }
-        return acc;
-      }, [])
-      .sort((a, b) => b.salience - a.salience);
+    let entities = [...result.entities];
 
     if (filterType !== 'ALL') {
       entities = entities.filter(entity => entity.type === filterType);
@@ -244,7 +175,12 @@ export default function EntityAnalyzer() {
       const term = searchTerm.toLowerCase();
       entities = entities.filter(entity => 
         entity.name.toLowerCase().includes(term) ||
-        entity.type.toLowerCase().includes(term)
+        entity.type.toLowerCase().includes(term) ||
+        entity.category?.toLowerCase().includes(term) ||
+        entity.relationships?.some((r: EntityRelationship) => 
+          r.entity.toLowerCase().includes(term) || 
+          r.type.toLowerCase().includes(term)
+        )
       );
     }
 
@@ -259,97 +195,84 @@ export default function EntityAnalyzer() {
     }, {});
   }, [filteredEntities]);
 
+  if (!result) {
+    return <ErrorMessage>No analysis result available</ErrorMessage>;
+  }
+
   return (
     <Container>
-      <SearchSection>
-        <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Input
-              type="url"
-              value={url}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setUrl(e.target.value);
-                if (error) setError(null);
-              }}
-              placeholder="Enter URL to analyze (e.g., https://example.com)"
-              required
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Analyzing...' : 'Analyze'}
-            </button>
-          </FormGroup>
-        </Form>
-      </SearchSection>
+      <SearchTools
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onExport={handleExport}
+      />
 
-      {loading && (
-        <LoadingContainer>
-          <LoadingSpinner />
-          <p>Analyzing content...</p>
-        </LoadingContainer>
-      )}
+      <SentimentCard 
+        type={result.sentiment}
+        confidence={result.sentimentConfidence}
+        description={result.sentimentExplanation}
+      />
 
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      <Grid columns={4}>
+        {Object.entries(entityTypeStats).map(([type, count]) => (
+          <EntityCard
+            key={type}
+            onClick={() => setFilterType(filterType === type ? 'ALL' : type)}
+            style={{ cursor: 'pointer' }}
+          >
+            <EntityHeader>
+              <EntityName>{type}</EntityName>
+              <EntityType>{count}</EntityType>
+            </EntityHeader>
+            <div>
+              {((count / filteredEntities.length) * 100).toFixed(1)}% of total
+            </div>
+          </EntityCard>
+        ))}
+      </Grid>
 
-      {result && (
-        <ResultsSection>
-          <SearchTools
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onExport={handleExport}
-          />
-
-          <SentimentCard 
-            type={result.sentiment}
-            confidence={result.sentimentConfidence}
-            description={result.sentimentExplanation}
-          />
-
-          <Grid columns={4}>
-            {Object.entries(entityTypeStats).map(([type, count]) => (
-              <EntityTypeCard
-                key={type}
-                active={filterType === type}
-                type={type}
-                onClick={() => setFilterType(filterType === type ? 'ALL' : type)}
-              >
-                <div style={{ opacity: 0.75 }}>{type}</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 'var(--space-2) 0' }}>
-                  {count}
-                </div>
-                <div>
-                  {((count / filteredEntities.length) * 100).toFixed(1)}% of total
-                </div>
-              </EntityTypeCard>
-            ))}
-          </Grid>
-
-          <Grid columns={3} style={{ marginTop: 'var(--space-6)' }}>
-            {filteredEntities.map((entity, index) => (
-              <EntityCard key={index}>
-                <EntityHeader>
-                  <EntityName>{entity.name}</EntityName>
-                  <EntityType type={entity.type}>{entity.type}</EntityType>
-                </EntityHeader>
-                <EntityStats>
-                  <StatRow>
-                    <span>Mentions</span>
-                    <span>{entity.mentions}×</span>
-                  </StatRow>
-                  <div>
-                    <StatRow>
-                      <span>Relevance</span>
-                      <span>{(entity.salience * 100).toFixed(1)}%</span>
-                    </StatRow>
-                    <ProgressBar>
-                      <div style={{ width: `${entity.salience * 100}%` }} />
-                    </ProgressBar>
-                  </div>
-                </EntityStats>
-              </EntityCard>
-            ))}
-          </Grid>
-        </ResultsSection>
-      )}
+      <Grid columns={3} style={{ marginTop: 'var(--space-6)' }}>
+        {filteredEntities.map((entity: Entity, index: number) => (
+          <EntityCard key={index}>
+            <EntityHeader>
+              <EntityName>{entity.name}</EntityName>
+              <EntityType>{entity.type}</EntityType>
+            </EntityHeader>
+            <EntityStats>
+              <StatRow>
+                <span>Mentions</span>
+                <span>{entity.mentions}×</span>
+              </StatRow>
+              <div>
+                <StatRow>
+                  <span>Relevance</span>
+                  <span>{(entity.salience * 100).toFixed(1)}%</span>
+                </StatRow>
+                <ProgressBar>
+                  <div style={{ width: `${entity.salience * 100}%` }} />
+                </ProgressBar>
+              </div>
+              {entity.category && (
+                <StatRow>
+                  <span>Category</span>
+                  <span>{entity.category}</span>
+                </StatRow>
+              )}
+              {entity.relationships && entity.relationships.length > 0 && (
+                <RelationshipList>
+                  {entity.relationships.map((rel: EntityRelationship, idx: number) => (
+                    <RelationshipItem key={idx} type={rel.type}>
+                      <RelationshipIcon>{getRelationshipIcon(rel.type)}</RelationshipIcon>
+                      {getRelationshipText(rel.type)}: {rel.entity}
+                      {rel.context && <span className="context"> - {rel.context}</span>}
+                    </RelationshipItem>
+                  ))}
+                </RelationshipList>
+              )}
+            </EntityStats>
+          </EntityCard>
+        ))}
+      </Grid>
     </Container>
   );
 }

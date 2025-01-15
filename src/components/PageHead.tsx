@@ -1,19 +1,27 @@
-'use client';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { getPageMetadata, metadata } from '@/utils/metadata';
 
-export interface PageHeadProps {
-  page: keyof typeof metadata;
+interface PageHeadProps {
+  title: string;
+  description: string;
 }
 
-export default function PageHead({ page }: PageHeadProps) {
-  const router = useRouter();
-  const pageMetadata = getPageMetadata(page);
-  
-  // Get the current absolute URL
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const canonicalUrl = `${origin}${router.asPath}`;
+export default function PageHead({ title, description }: PageHeadProps) {
+  const pageMetadata = {
+    title: title || 'SEO Tools - Web Analysis & Optimization Tools',
+    description: description || 'A collection of powerful SEO tools for web analysis and optimization.',
+    keywords: [
+      'SEO tools',
+      'web analysis',
+      'SEO optimization',
+      'website analysis',
+      'SEO checker',
+      'entity analysis',
+      'named entity recognition'
+    ],
+    robots: 'index, follow',
+    viewport: 'width=device-width, initial-scale=1',
+    charset: 'utf-8'
+  };
 
   return (
     <Head>
@@ -21,30 +29,10 @@ export default function PageHead({ page }: PageHeadProps) {
       <meta name="description" content={pageMetadata.description} />
       <meta name="keywords" content={pageMetadata.keywords.join(', ')} />
       <meta name="robots" content={pageMetadata.robots} />
-      
-      {/* Self-referencing Canonical URL */}
-      <link rel="canonical" href={canonicalUrl} />
-      
-      {/* Favicon */}
-      <link rel="icon" href="/favicon.svg" />
-      <meta name="google-site-verification" content="[your-verification-code]" />
-      
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:title" content={pageMetadata.title} />
-      <meta property="og:description" content={pageMetadata.description} />
-      <meta property="og:image" content={`${origin}/favicon.svg`} />
-      
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={canonicalUrl} />
-      <meta name="twitter:title" content={pageMetadata.title} />
-      <meta name="twitter:description" content={pageMetadata.description} />
-      <meta name="twitter:image" content={`${origin}/favicon.svg`} />
-      
-      {/* Viewport */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="viewport" content={pageMetadata.viewport} />
+      <meta charSet={pageMetadata.charset} />
+      <meta name="google-site-verification" content="NGx9xLCGuT_79aJ944wJVzF45g78u6marGFNFxI9V9U" />
+      <link rel="icon" href="/favicon.ico" />
     </Head>
   );
 }

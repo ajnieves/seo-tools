@@ -1,17 +1,38 @@
+export type EntityType = 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'EVENT' | 'TRANSPORT' | 'TECHNOLOGY' | 'MISC';
+
+export interface EntityRelationship {
+  entity: string;
+  type: 'executive' | 'founder' | 'employee' | 'partnership' | 'collaboration' | 'subsidiary' | 'incident' | 'movement' | 'temporal';
+  strength: number;
+  context?: string;
+  timestamp?: string;
+}
+
 export interface Entity {
   name: string;
-  type: string;
-  salience: number;
+  type: EntityType;
   mentions: number;
   confidence: number;
+  salience: number;
   category?: string;
   context?: string;
-  htmlContext?: string;
-  relationships?: Array<{
-    entity: string;
-    type: string;
-    strength: number;
-  }>;
+  htmlContext?: 'title' | 'heading' | 'content';
+  relationships: EntityRelationship[];
+  temporalContext?: {
+    timestamp?: string;
+    timeframe?: string;
+    sequence?: number;
+  };
+  coReferences?: string[];
+  groupId?: string;
+}
+
+export interface EntityGroup {
+  id: string;
+  name: string;
+  type: EntityType;
+  entities: Entity[];
+  relationships: EntityRelationship[];
 }
 
 export interface EntityMetadata {
@@ -27,41 +48,22 @@ export interface EntityMetadata {
   };
   entityDistribution: {
     byType: Record<string, number>;
-    byCategory?: Record<string, number>;
+    byCategory: Record<string, number>;
+  };
+  timeline?: {
+    events: Array<{
+      timestamp: string;
+      entities: string[];
+      description: string;
+    }>;
   };
 }
 
 export interface AnalysisResult {
   entities: Entity[];
-  sentiment: string;
+  entityGroups?: EntityGroup[];
+  sentiment: 'positive' | 'negative' | 'neutral';
   sentimentConfidence: number;
   sentimentExplanation: string;
   metadata: EntityMetadata;
-}
-
-export interface EntityContext {
-  prevWords: string[];
-  nextWords: string[];
-  sentence: string;
-  paragraph: string;
-  htmlTag?: string;
-}
-
-export type EntityType = 
-  | 'PERSON'
-  | 'ORGANIZATION'
-  | 'LOCATION'
-  | 'PRODUCT'
-  | 'BRAND'
-  | 'TECHNOLOGY'
-  | 'EVENT'
-  | 'DATE'
-  | 'MISC';
-
-export interface EntityRelationship {
-  sourceEntity: string;
-  targetEntity: string;
-  relationType: string;
-  confidence: number;
-  context: string;
 }
