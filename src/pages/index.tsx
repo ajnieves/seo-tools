@@ -48,11 +48,6 @@ const ToolDescription = styled.p`
 
 const tools = [
   {
-    title: 'Entity Analyzer',
-    description: 'Extract and analyze named entities from web content. Identify key subjects, organizations, locations, and more.',
-    href: '/entity-analyzer',
-  },
-  {
     title: 'XML Sitemap Generator',
     description: 'Generate XML sitemaps for your website to help search engines better understand and index your content structure.',
     href: '/sitemap-generator',
