@@ -7,32 +7,27 @@ const pages = [
   {
     url: '/',
     priority: '1.0',
-    changefreq: 'weekly'
-  },
-  {
-    url: '/entity-analyzer',
-    priority: '0.8',
-    changefreq: 'weekly'
+    changefreq: 'daily'
   },
   {
     url: '/sitemap-generator',
     priority: '0.8',
-    changefreq: 'weekly'
+    changefreq: 'daily'
   },
   {
     url: '/rss-parser',
     priority: '0.8',
-    changefreq: 'weekly'
+    changefreq: 'daily'
   },
   {
     url: '/robots-tester',
     priority: '0.8',
-    changefreq: 'weekly'
+    changefreq: 'daily'
   },
   {
     url: '/percentage-calculator',
     priority: '0.8',
-    changefreq: 'weekly'
+    changefreq: 'daily'
   }
 ];
 

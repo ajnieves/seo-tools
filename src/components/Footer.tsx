@@ -119,19 +119,6 @@ const BottomBar = styled.div`
 
 const tools = [
   {
-    name: 'Content Analysis',
-    items: [
-      {
-        name: 'Article Evaluator',
-        href: '/article-evaluator',
-      },
-      {
-        name: 'Entity Analyzer',
-        href: '/entity-analyzer',
-      },
-    ],
-  },
-  {
     name: 'Technical SEO',
     items: [
       {
