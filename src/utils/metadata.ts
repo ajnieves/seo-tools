@@ -27,28 +27,28 @@ export const metadata: SiteMetadata = {
     canonicalUrl: `${BASE_URL}`,
     robots: 'index, follow'
   },
-  sitemapGenerator: {
+  'sitemap-generator': {
     title: 'XML Sitemap Generator - Create SEO-friendly Sitemaps',
     description: 'Generate XML sitemaps to help search engines better understand and index your website structure.',
     keywords: ['sitemap generator', 'XML sitemap', 'SEO sitemap', 'website indexing'],
     canonicalUrl: `${BASE_URL}/sitemap-generator`,
     robots: 'index, follow'
   },
-  rssParser: {
+  'rss-parser': {
     title: 'RSS Feed Parser - Validate and Analyze RSS Feeds',
     description: 'Parse and validate RSS feeds to ensure proper syndication and content distribution.',
     keywords: ['RSS parser', 'feed validator', 'RSS feed analysis', 'content syndication'],
     canonicalUrl: `${BASE_URL}/rss-parser`,
     robots: 'index, follow'
   },
-  robotsTester: {
+  'robots-tester': {
     title: 'Robots.txt Tester - Validate Crawler Access Rules',
     description: 'Test and validate your robots.txt file to ensure proper search engine crawler access control.',
     keywords: ['robots.txt', 'crawler access', 'SEO testing', 'search engine crawlers'],
     canonicalUrl: `${BASE_URL}/robots-tester`,
     robots: 'index, follow'
   },
-  percentageCalculator: {
+  'percentage-calculator': {
     title: 'Percentage Calculator - SEO Metrics Calculator',
     description: 'Calculate percentages for SEO metrics, conversion rates, and performance indicators.',
     keywords: ['percentage calculator', 'SEO metrics', 'conversion calculator', 'performance metrics'],

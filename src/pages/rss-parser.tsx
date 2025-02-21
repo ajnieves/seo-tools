@@ -23,10 +23,7 @@ const ContentContainer = styled(Container)`
 export default function RSSParserPage() {
   return (
     <>
-      <PageHead 
-        title="RSS Feed Parser - Validate RSS Feeds"
-        description="Parse and validate RSS feeds to ensure proper syndication. Check feed structure, content compatibility, and validate against RSS standards."
-      />
+      <PageHead />
       <ContentContainer>
         <Title>RSS Feed Parser</Title>
         <RSSParser />

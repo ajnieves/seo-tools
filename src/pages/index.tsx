@@ -72,10 +72,7 @@ const tools = [
 export default function Home() {
   return (
     <>
-      <PageHead 
-        title="SEO Tools - Web Analysis & Optimization Tools"
-        description="A suite of SEO tools for web analysis and optimization. Features include entity analysis, sitemap generation, RSS parsing, and more."
-      />
+      <PageHead />
       
       <Container>
         <Title>SEO Tools</Title>

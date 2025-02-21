@@ -23,10 +23,7 @@ const ContentContainer = styled(Container)`
 export default function RobotsTesterPage() {
   return (
     <>
-      <PageHead 
-        title="Robots.txt Tester - Validate Crawler Directives"
-        description="Test and validate your robots.txt file to ensure proper search engine crawling directives. Check URL patterns and crawler permissions."
-      />
+      <PageHead />
       <ContentContainer>
         <Title>Robots.txt Tester</Title>
         <RobotsTester />
