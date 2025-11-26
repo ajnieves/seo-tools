@@ -1,6 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { AnalysisResult, EntityMetadata, Entity } from '@/types/analysis';
 import { extractEntities } from '@/services/entityExtraction';
+import { extractEntitiesWithTransformers, getModelStatus } from '@/services/transformersEntityExtraction';
+import { setCorsHeaders } from '@/utils/cors';
+import { validateUrlOrThrow } from '@/utils/urlValidation';
+import { safeFetch, DEFAULT_TIMEOUT } from '@/utils/fetchWithTimeout';
+import { 
+  stripHtmlTags, 
+  extractArticleContent,
+  extractTitle, 
+  extractHeadings, 
+  extractParagraphs, 
+  extractListItems 
+} from '@/utils/htmlUtils';
 
 export const config = {
   api: {
@@ -14,19 +26,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  // Handle CORS
+  const isPreflightHandled = setCorsHeaders(req, res);
+  if (isPreflightHandled) return;
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -39,17 +41,23 @@ export default async function handler(
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    console.log('Analyzing URL:', url);
+    // Validate URL to prevent SSRF attacks
+    let sanitizedUrl: string;
+    try {
+      sanitizedUrl = validateUrlOrThrow(url);
+    } catch (error) {
+      return res.status(400).json({ 
+        error: error instanceof Error ? error.message : 'Invalid URL' 
+      });
+    }
 
-    // Handle data URLs for testing
+    // Fetch the URL content with timeout
     let text: string;
     let html: string;
     
     try {
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+      const response = await safeFetch(sanitizedUrl, {
+        timeout: DEFAULT_TIMEOUT,
       });
       
       if (!response.ok) {
@@ -57,27 +65,17 @@ export default async function handler(
       }
 
       html = await response.text();
-      console.log('Fetched HTML length:', html.length);
       
-      // Clean HTML to extract text
-      text = html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/&[a-z]+;/gi, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      console.log('Cleaned text length:', text.length);
-      console.log('Sample text:', text.substring(0, 200) + '...');
+      // Extract main article content (removes nav, footer, etc.)
+      text = extractArticleContent(html);
     } catch (error) {
-      console.error('Error fetching URL:', error);
+      console.error('[Entity Analysis] Error fetching URL:', error);
       return res.status(400).json({ 
         error: error instanceof Error ? error.message : 'Failed to fetch URL'
       });
     }
 
-    // Extract document structure
+    // Extract document structure using utilities
     const processedStructure: EntityMetadata['processedStructure'] = {
       title: [],
       headings: [],
@@ -87,52 +85,51 @@ export default async function handler(
 
     try {
       // Extract title
-      const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
-      if (titleMatch) {
-        processedStructure.title.push(titleMatch[1].trim());
+      const title = extractTitle(html);
+      if (title) {
+        processedStructure.title.push(title);
       }
 
       // Extract headings
-      const headings = html.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi);
-      if (headings) {
-        processedStructure.headings = headings.map(h => 
-          h.replace(/<[^>]+>/g, '').trim()
-        );
-      }
+      processedStructure.headings = extractHeadings(html);
 
       // Extract paragraphs
-      const paragraphs = html.match(/<p[^>]*>(.*?)<\/p>/gi);
-      if (paragraphs) {
-        processedStructure.paragraphs = paragraphs.map(p => 
-          p.replace(/<[^>]+>/g, '').trim()
-        );
-      }
+      processedStructure.paragraphs = extractParagraphs(html);
 
       // Extract lists
-      const lists = html.match(/<li[^>]*>(.*?)<\/li>/gi);
-      if (lists) {
-        processedStructure.lists = lists.map(li => 
-          li.replace(/<[^>]+>/g, '').trim()
-        );
-      }
-
-      console.log('Document structure:', {
-        titleCount: processedStructure.title.length,
-        headingsCount: processedStructure.headings.length,
-        paragraphsCount: processedStructure.paragraphs.length,
-        listsCount: processedStructure.lists.length
-      });
+      processedStructure.lists = extractListItems(html);
     } catch (error) {
-      console.error('Error processing document structure:', error);
+      console.error('[Entity Analysis] Error processing document structure:', error);
     }
 
-    // Extract entities
+    // Extract entities using Transformers (with fallback to regex)
     let entities: Entity[] = [];
+    let extractionMethod = 'transformers';
+    
     try {
-      entities = extractEntities(text, processedStructure);
-      console.log('Extracted entities count:', entities.length);
+      // Check if we should use transformers (default: yes)
+      const useTransformers = req.body.useTransformers !== false;
+      
+      if (useTransformers) {
+        const modelStatus = getModelStatus();
+        if (modelStatus.initializing) {
+          console.log('[Entity Analysis] Model is initializing, this may take a moment...');
+        }
+        
+        try {
+          entities = await extractEntitiesWithTransformers(text);
+          console.log(`[Entity Analysis] Extracted ${entities.length} entities using Transformers`);
+        } catch (transformerError) {
+          console.warn('[Entity Analysis] Transformers extraction failed, falling back to regex:', transformerError);
+          entities = extractEntities(text, processedStructure);
+          extractionMethod = 'regex-fallback';
+        }
+      } else {
+        entities = extractEntities(text, processedStructure);
+        extractionMethod = 'regex';
+      }
     } catch (error) {
-      console.error('Error extracting entities:', error);
+      console.error('[Entity Analysis] Error extracting entities:', error);
       return res.status(500).json({ 
         error: 'Failed to extract entities from content'
       });
@@ -174,7 +171,7 @@ export default async function handler(
     
     let positiveScore = 0;
     let negativeScore = 0;
-    let sentimentPhrases: string[] = [];
+    const sentimentPhrases: string[] = [];
 
     // Analyze sentiment with context
     for (let i = 0; i < words.length; i++) {
@@ -242,16 +239,16 @@ export default async function handler(
       sentimentConfidence: sentimentResult.confidence,
       sentimentExplanation: sentimentResult.explanation,
       metadata: {
-        url,
+        url: sanitizedUrl,
         entityCount: entities.length,
         contentLength: text.length,
         timestamp: new Date().toISOString(),
         processedStructure,
-        entityDistribution
+        entityDistribution,
+        extractionMethod
       }
     };
 
-    console.log('Analysis complete');
     return res.status(200).json(result);
   } catch (error) {
     console.error('[Entity Analysis] Error:', error);

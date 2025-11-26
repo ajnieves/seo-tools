@@ -1,5 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as cheerio from 'cheerio';
+import { setCorsHeaders } from '@/utils/cors';
+import { validateUrl, validateUrlOrThrow } from '@/utils/urlValidation';
+import { safeFetch } from '@/utils/fetchWithTimeout';
+
+// Configuration constants
+const CRAWL_CONFIG = {
+  MAX_PAGES: 50,
+  TIMEOUT: 15000, // 15 seconds per page
+  CONCURRENT_REQUESTS: 3,
+} as const;
 
 interface SitemapUrl {
   loc: string;
@@ -7,7 +17,11 @@ interface SitemapUrl {
   priority?: number;
 }
 
-async function crawlPage(url: string, baseUrl: string, visited = new Set<string>()): Promise<SitemapUrl[]> {
+async function crawlPage(
+  url: string, 
+  baseUrl: string, 
+  visited = new Set<string>()
+): Promise<SitemapUrl[]> {
   if (visited.has(url)) {
     return [];
   }
@@ -20,10 +34,8 @@ async function crawlPage(url: string, baseUrl: string, visited = new Set<string>
   }];
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; SEOToolsCrawler/1.0)'
-      }
+    const response = await safeFetch(url, {
+      timeout: CRAWL_CONFIG.TIMEOUT,
     });
 
     if (!response.ok) {
@@ -45,19 +57,22 @@ async function crawlPage(url: string, baseUrl: string, visited = new Set<string>
           return null;
         }
       })
-      .filter((href): href is string => 
-        href !== null && 
-        href.startsWith(baseUrl) && 
-        !href.includes('#') &&
-        !visited.has(href)
-      );
+      .filter((href): href is string => {
+        if (href === null) return false;
+        if (!href.startsWith(baseUrl)) return false;
+        if (href.includes('#')) return false;
+        if (visited.has(href)) return false;
+        
+        // Validate the URL to prevent following dangerous links
+        const validation = validateUrl(href);
+        return validation.isValid;
+      });
 
     // Limit crawling to prevent timeout
-    const maxPages = 50;
-    const uniqueLinks = [...new Set(links)].slice(0, maxPages);
+    const uniqueLinks = [...new Set(links)].slice(0, CRAWL_CONFIG.MAX_PAGES);
 
     for (const link of uniqueLinks) {
-      if (visited.size >= maxPages) break;
+      if (visited.size >= CRAWL_CONFIG.MAX_PAGES) break;
       const pageUrls = await crawlPage(link, baseUrl, visited);
       urls.push(...pageUrls);
     }
@@ -72,7 +87,7 @@ function generateXmlSitemap(urls: SitemapUrl[]): string {
   const urlElements = urls
     .map(url => `
   <url>
-    <loc>${url.loc}</loc>
+    <loc>${escapeXml(url.loc)}</loc>
     ${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ''}
     ${url.priority ? `<priority>${url.priority}</priority>` : ''}
   </url>`)
@@ -83,7 +98,23 @@ function generateXmlSitemap(urls: SitemapUrl[]): string {
 </urlset>`;
 }
 
+/**
+ * Escape special XML characters
+ */
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS
+  const isPreflightHandled = setCorsHeaders(req, res);
+  if (isPreflightHandled) return;
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -95,7 +126,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    const baseUrl = new URL(url).origin;
+    // Validate URL
+    let sanitizedUrl: string;
+    try {
+      sanitizedUrl = validateUrlOrThrow(url);
+    } catch (error) {
+      return res.status(400).json({ 
+        error: error instanceof Error ? error.message : 'Invalid URL' 
+      });
+    }
+
+    const baseUrl = new URL(sanitizedUrl).origin;
     console.log(`[Sitemap Generator] Starting crawl of ${baseUrl}`);
 
     const urls = await crawlPage(baseUrl, baseUrl);

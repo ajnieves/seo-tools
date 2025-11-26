@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { setCorsHeaders } from '@/utils/cors';
+import { validateUrl } from '@/utils/urlValidation';
+import { safeFetch, DEFAULT_TIMEOUT } from '@/utils/fetchWithTimeout';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS
+  const isPreflightHandled = setCorsHeaders(req, res);
+  if (isPreflightHandled) return;
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -12,12 +19,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'URL is required' });
     }
 
+    // Validate URL
+    const validation = validateUrl(url);
+    if (!validation.isValid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
     // Parse the URL to get the domain
-    const parsedUrl = new URL(url);
+    const parsedUrl = new URL(validation.sanitizedUrl!);
     const robotsUrl = `${parsedUrl.protocol}//${parsedUrl.host}/robots.txt`;
 
-    // Fetch the robots.txt content
-    const response = await fetch(robotsUrl);
+    // Fetch the robots.txt content with timeout
+    const response = await safeFetch(robotsUrl, {
+      timeout: DEFAULT_TIMEOUT,
+    });
     
     if (!response.ok) {
       if (response.status === 404) {

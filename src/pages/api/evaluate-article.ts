@@ -1,46 +1,80 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
-import { NextResponse } from 'next/server';
+import { setCorsHeaders } from '@/utils/cors';
+import { validateUrlOrThrow } from '@/utils/urlValidation';
+import { safeFetch, DEFAULT_TIMEOUT } from '@/utils/fetchWithTimeout';
+import { stripHtmlTags, extractH1, extractTitle, extractMetaDescription } from '@/utils/htmlUtils';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization of OpenAI client to prevent module-level errors
+let openai: OpenAI | null = null;
 
-async function fetchArticleContent(url: string) {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch article: ${response.statusText}`);
-    }
-    const html = await response.text();
-    return html;
-  } catch (error) {
-    console.error('Error fetching article:', error);
-    throw new Error('Failed to fetch article content');
+function getOpenAIClient(): OpenAI | null {
+  if (!process.env.OPENAI_API_KEY) {
+    return null;
   }
+  if (!openai) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+}
+
+// Constants
+const MAX_CONTENT_LENGTH = 1500;
+
+async function fetchArticleContent(url: string): Promise<string> {
+  const response = await safeFetch(url, {
+    timeout: DEFAULT_TIMEOUT,
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch article: ${response.statusText}`);
+  }
+  
+  return response.text();
+}
+
+/**
+ * Safely parse JSON with error handling
+ */
+function safeJsonParse<T>(json: string, fallback: T): T {
+  try {
+    return JSON.parse(json) as T;
+  } catch (error) {
+    console.error('Failed to parse JSON:', error);
+    return fallback;
+  }
+}
+
+interface SeoRecommendations {
+  recommendedH1?: string;
+  recommendedMetaTitle?: string;
+  recommendedMetaDescription?: string;
+}
+
+interface SentimentAnalysis {
+  type?: 'positive' | 'neutral' | 'negative';
+  explanation?: string;
+}
+
+interface ArticleResult {
+  currentH1: string;
+  currentMetaTitle: string;
+  currentMetaDescription: string;
+  recommendedH1?: string;
+  recommendedMetaTitle?: string;
+  recommendedMetaDescription?: string;
+  sentiment?: SentimentAnalysis;
 }
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  // Handle CORS
+  const isPreflightHandled = setCorsHeaders(req, res);
+  if (isPreflightHandled) return;
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -52,21 +86,38 @@ export default async function handler(
     return res.status(400).json({ error: 'URL is required' });
   }
 
+  // Validate URL to prevent SSRF attacks
+  let sanitizedUrl: string;
+  try {
+    sanitizedUrl = validateUrlOrThrow(url);
+  } catch (error) {
+    return res.status(400).json({ 
+      error: error instanceof Error ? error.message : 'Invalid URL' 
+    });
+  }
+
   try {
     // Fetch article content
-    const html = await fetchArticleContent(url);
+    const html = await fetchArticleContent(sanitizedUrl);
 
-    // Extract metadata using regex
-    const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
-    const metaDescMatch = html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/i);
+    // Extract metadata using utilities
+    const currentH1 = extractH1(html);
+    const currentMetaTitle = extractTitle(html);
+    const currentMetaDescription = extractMetaDescription(html);
 
-    const currentH1 = h1Match ? h1Match[1].trim() : '';
-    const currentMetaTitle = titleMatch ? titleMatch[1].trim() : '';
-    const currentMetaDescription = metaDescMatch ? metaDescMatch[1].trim() : '';
+    // Build the base result with current metadata
+    const result: ArticleResult = {
+      currentH1,
+      currentMetaTitle,
+      currentMetaDescription,
+    };
 
-    // Get SEO recommendations from OpenAI
-    const seoPrompt = `Analyze and improve the following SEO elements for better search engine visibility:
+    // Get OpenAI client (may be null if no API key)
+    const client = getOpenAIClient();
+
+    if (client) {
+      // Get SEO recommendations from OpenAI
+      const seoPrompt = `Analyze and improve the following SEO elements for better search engine visibility:
 
 H1: "${currentH1}"
 Meta Title: "${currentMetaTitle}"
@@ -84,33 +135,25 @@ Return in JSON format:
   "recommendedMetaDescription": "improved description"
 }`;
 
-    const seoCompletion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: seoPrompt }],
-      temperature: 0.7,
-    });
+      const seoCompletion = await client.chat.completions.create({
+        model: "gpt-4",
+        messages: [{ role: "user", content: seoPrompt }],
+        temperature: 0.7,
+      });
 
-    const seoRecommendations = JSON.parse(seoCompletion.choices[0].message?.content || '{}');
+      const seoContent = seoCompletion.choices[0].message?.content || '{}';
+      const seoRecommendations = safeJsonParse<SeoRecommendations>(seoContent, {});
+      
+      result.recommendedH1 = seoRecommendations.recommendedH1;
+      result.recommendedMetaTitle = seoRecommendations.recommendedMetaTitle;
+      result.recommendedMetaDescription = seoRecommendations.recommendedMetaDescription;
 
-    let result = {
-      currentH1,
-      currentMetaTitle,
-      currentMetaDescription,
-      ...seoRecommendations,
-    };
+      // Add sentiment analysis if requested
+      if (includeSentiment) {
+        // Extract main content using utility
+        const bodyContent = stripHtmlTags(html).slice(0, MAX_CONTENT_LENGTH);
 
-    // Add sentiment analysis if requested
-    if (includeSentiment) {
-      // Extract main content
-      const bodyContent = html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-        .replace(/<[^>]*>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 1500);
-
-      const sentimentPrompt = `Analyze the sentiment of this article excerpt and explain why. Return in JSON format with 'type' (positive/neutral/negative) and 'explanation':
+        const sentimentPrompt = `Analyze the sentiment of this article excerpt and explain why. Return in JSON format with 'type' (positive/neutral/negative) and 'explanation':
 
 ${bodyContent}
 
@@ -120,25 +163,40 @@ Example response:
   "explanation": "The article maintains an optimistic tone, emphasizing benefits and opportunities..."
 }`;
 
-      const sentimentCompletion = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "user", content: sentimentPrompt }],
-        temperature: 0.7,
-      });
+        const sentimentCompletion = await client.chat.completions.create({
+          model: "gpt-4",
+          messages: [{ role: "user", content: sentimentPrompt }],
+          temperature: 0.7,
+        });
 
-      const sentimentAnalysis = JSON.parse(sentimentCompletion.choices[0].message?.content || '{}');
-      result.sentiment = sentimentAnalysis;
+        const sentimentContent = sentimentCompletion.choices[0].message?.content || '{}';
+        const sentimentAnalysis = safeJsonParse<SentimentAnalysis>(sentimentContent, {});
+        result.sentiment = sentimentAnalysis;
+      }
+    } else {
+      // No OpenAI API key - provide basic analysis only
+      result.recommendedH1 = 'AI recommendations require OPENAI_API_KEY';
+      result.recommendedMetaTitle = 'Configure OPENAI_API_KEY for AI suggestions';
+      result.recommendedMetaDescription = 'To get AI-powered SEO recommendations, please configure the OPENAI_API_KEY environment variable.';
+      
+      if (includeSentiment) {
+        result.sentiment = {
+          type: 'neutral',
+          explanation: 'Sentiment analysis requires OPENAI_API_KEY to be configured.',
+        };
+      }
     }
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error processing request:', error);
     
-    // Return detailed error for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
     return res.status(500).json({
       error: 'Failed to analyze article',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: errorMessage,
+      ...(process.env.NODE_ENV === 'development' && error instanceof Error && { stack: error.stack })
     });
   }
 }
@@ -149,4 +207,4 @@ export const config = {
       sizeLimit: '1mb',
     },
   },
-}
+};

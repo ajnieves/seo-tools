@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { setCorsHeaders } from '@/utils/cors';
 
 interface RobotsRule {
   pattern: string;
@@ -71,12 +72,16 @@ function isUrlAllowed(url: string, rules: RobotsRule[]): { allowed: boolean; rea
       allowed: true,
       reason: 'No matching rules found - access is allowed by default'
     };
-  } catch (error) {
+  } catch {
     throw new Error('Invalid URL format');
   }
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS
+  const isPreflightHandled = setCorsHeaders(req, res);
+  if (isPreflightHandled) return;
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

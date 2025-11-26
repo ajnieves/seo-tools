@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as cheerio from 'cheerio';
+import { setCorsHeaders } from '@/utils/cors';
+import { validateUrlOrThrow } from '@/utils/urlValidation';
+import { safeFetch, DEFAULT_TIMEOUT } from '@/utils/fetchWithTimeout';
 
 interface FeedItem {
   title: string;
@@ -81,6 +84,10 @@ function parseAtomFeed(xml: string): FeedData {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS
+  const isPreflightHandled = setCorsHeaders(req, res);
+  if (isPreflightHandled) return;
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -92,11 +99,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    console.log(`[RSS Parser] Fetching feed from ${url}`);
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; SEOToolsRSSParser/1.0)'
-      }
+    // Validate URL
+    let sanitizedUrl: string;
+    try {
+      sanitizedUrl = validateUrlOrThrow(url);
+    } catch (error) {
+      return res.status(400).json({ 
+        error: error instanceof Error ? error.message : 'Invalid URL' 
+      });
+    }
+
+    console.log(`[RSS Parser] Fetching feed from ${sanitizedUrl}`);
+    
+    const response = await safeFetch(sanitizedUrl, {
+      timeout: DEFAULT_TIMEOUT,
     });
 
     if (!response.ok) {
