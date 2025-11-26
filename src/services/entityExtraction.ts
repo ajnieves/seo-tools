@@ -45,6 +45,9 @@ export function extractEntities(text: string, structure: DocumentStructure): Ent
     salience: totalMentions > 0 ? entity.mentions / totalMentions : 0
   }));
 
+  // Sort by salience FIRST to ensure we work with the most important entities
+  entityArray.sort((a, b) => b.salience - a.salience);
+
   // Second pass: Add relationships between top entities only (for performance)
   // Limit to top 20 most salient entities for relationship detection
   const topEntities = entityArray.slice(0, Math.min(20, entityArray.length));
@@ -67,10 +70,8 @@ export function extractEntities(text: string, structure: DocumentStructure): Ent
     });
   });
 
-  // Return top entities only (limit to 30 for better UX)
-  return entityArray
-    .sort((a, b) => b.salience - a.salience)
-    .slice(0, 30);
+  // Return top entities only (limit to 30 for better UX, already sorted)
+  return entityArray.slice(0, 30);
 }
 
 function processText(

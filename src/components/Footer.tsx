@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
 import { footerNavigation } from '@/config/navigation';
@@ -118,6 +119,50 @@ const BottomBar = styled.div`
   );
 `;
 
+const VersionInfo = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  font-family: 'Courier New', monospace;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+`;
+
+const VersionBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background: rgba(0, 229, 176, 0.1);
+  border: 1px solid rgba(0, 229, 176, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--primary-color);
+  font-weight: 500;
+
+  &:hover {
+    background: rgba(0, 229, 176, 0.15);
+    border-color: rgba(0, 229, 176, 0.3);
+  }
+`;
+
+const GitHash = styled.span`
+  color: var(--text-secondary);
+  
+  &::before {
+    content: '•';
+    margin: 0 var(--space-2);
+    color: var(--border-color);
+  }
+`;
+
 const ArrowIcon = (
   <svg
     viewBox="0 0 24 24"
@@ -132,7 +177,32 @@ const ArrowIcon = (
   </svg>
 );
 
+interface VersionData {
+  version: string;
+  gitHash: string;
+  gitBranch: string;
+  buildTime: string;
+}
+
 export default function Footer() {
+  const [versionData, setVersionData] = useState<VersionData | null>(null);
+
+  useEffect(() => {
+    // Fetch version info
+    fetch('/version.json')
+      .then(res => res.json())
+      .then(data => setVersionData(data))
+      .catch(() => {
+        // If version.json doesn't exist, use package.json version
+        setVersionData({
+          version: '0.1.0',
+          gitHash: 'dev',
+          gitBranch: 'main',
+          buildTime: new Date().toISOString()
+        });
+      });
+  }, []);
+
   return (
     <FooterContainer>
       <FooterContent>
@@ -172,6 +242,17 @@ export default function Footer() {
         <FooterText>
           © {new Date().getFullYear()} Technical SEO Tools. All rights reserved.
         </FooterText>
+        
+        {versionData && (
+          <VersionInfo>
+            <VersionBadge title={`Built: ${new Date(versionData.buildTime).toLocaleString()}`}>
+              v{versionData.version}
+            </VersionBadge>
+            <GitHash title={`Branch: ${versionData.gitBranch}`}>
+              {versionData.gitHash}
+            </GitHash>
+          </VersionInfo>
+        )}
       </BottomBar>
     </FooterContainer>
   );

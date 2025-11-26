@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run generate-sitemap && next build",
+    "build": "npm run generate-version && npm run generate-sitemap && next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-sitemap": "node scripts/generate-sitemap.js"
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "generate-version": "node scripts/generate-version.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
