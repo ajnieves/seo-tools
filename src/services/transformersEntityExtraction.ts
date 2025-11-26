@@ -133,9 +133,7 @@ export async function extractEntitiesWithTransformers(text: string): Promise<Ent
     console.log(`[Transformers NER] Processing ${truncatedText.length} characters...`);
     
     // Run NER pipeline
-    const rawResults = await ner(truncatedText, {
-      aggregation_strategy: 'simple', // Automatically groups subwords
-    }) as RawToken[];
+    const rawResults = await ner(truncatedText) as RawToken[];
     
     console.log(`[Transformers NER] Found ${rawResults.length} raw tokens`);
     
