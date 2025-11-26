@@ -1,4 +1,4 @@
-'use client';
+
 import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
 
@@ -92,7 +92,6 @@ export default function UrlAnalyzerForm({ onSubmit, loading }: Props) {
       // Call the parent's onSubmit handler
       await onSubmit(url);
     } catch (err) {
-      console.error('Form submission error:', err);
       if (err instanceof Error) {
         setError(err.message);
       } else {

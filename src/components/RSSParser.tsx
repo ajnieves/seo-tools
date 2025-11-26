@@ -1,4 +1,3 @@
-'use client';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import Button from './Button';

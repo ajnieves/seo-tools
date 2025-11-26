@@ -65,7 +65,7 @@ export default function SitemapAboutSection() {
         </ListItem>
       </List>
       <Text>
-        A well-structured XML sitemap helps search engines understand your website's structure and ensures all your important pages are discovered and indexed properly.
+        A well-structured XML sitemap helps search engines understand your website&apos;s structure and ensures all your important pages are discovered and indexed properly.
       </Text>
     </Section>
   );

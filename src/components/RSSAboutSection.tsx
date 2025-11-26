@@ -65,7 +65,7 @@ export default function RSSAboutSection() {
         </ListItem>
       </List>
       <Text>
-        Whether you're managing content syndication, monitoring feeds, or developing RSS-enabled applications, our parser provides the insights you need to ensure your feeds are working correctly.
+        Whether you&apos;re managing content syndication, monitoring feeds, or developing RSS-enabled applications, our parser provides the insights you need to ensure your feeds are working correctly.
       </Text>
     </Section>
   );

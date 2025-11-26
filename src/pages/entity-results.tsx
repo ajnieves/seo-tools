@@ -1,4 +1,4 @@
-'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
@@ -50,7 +50,6 @@ export default function EntityResultsPage() {
         const data = await response.json();
         setResult(data);
       } catch (err) {
-        console.error('Analysis error:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);

@@ -64,14 +64,14 @@ export default function RSSFAQSection() {
         <FAQItem>
           <Question>Why should I validate my RSS feed?</Question>
           <Answer>
-            Validating your RSS feed ensures it's properly formatted and can be read by feed readers and aggregators. Invalid feeds may not display correctly or might be rejected by some services.
+            Validating your RSS feed ensures it&apos;s properly formatted and can be read by feed readers and aggregators. Invalid feeds may not display correctly or might be rejected by some services.
           </Answer>
         </FAQItem>
 
         <FAQItem>
           <Question>What information can I extract from an RSS feed?</Question>
           <Answer>
-            You can extract feed title, description, publication date, author information, entry content, media attachments, and various other metadata depending on what's included in the feed.
+            You can extract feed title, description, publication date, author information, entry content, media attachments, and various other metadata depending on what&apos;s included in the feed.
           </Answer>
         </FAQItem>
 

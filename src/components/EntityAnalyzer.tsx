@@ -1,4 +1,4 @@
-'use client';
+
 import React, { useState, useMemo } from 'react';
 import styled from '@emotion/styled';
 import SearchTools from './SearchTools';

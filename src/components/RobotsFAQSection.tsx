@@ -50,7 +50,7 @@ export default function RobotsFAQSection() {
         <FAQItem>
           <Question>What is a robots.txt file?</Question>
           <Answer>
-            A robots.txt file is a text file placed in a website's root directory that provides instructions to search engine crawlers about which pages or sections of the site should or should not be crawled and indexed.
+            A robots.txt file is a text file placed in a website&apos;s root directory that provides instructions to search engine crawlers about which pages or sections of the site should or should not be crawled and indexed.
           </Answer>
         </FAQItem>
 

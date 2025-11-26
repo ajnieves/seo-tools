@@ -65,7 +65,7 @@ export default function CalculatorAboutSection() {
         </ListItem>
       </List>
       <Text>
-        Whether you're analyzing conversion rates, bounce rates, or other SEO metrics, our calculator helps you understand the percentage relationships between your numbers and track performance changes over time.
+        Whether you&apos;re analyzing conversion rates, bounce rates, or other SEO metrics, our calculator helps you understand the percentage relationships between your numbers and track performance changes over time.
       </Text>
     </Section>
   );

@@ -1,4 +1,4 @@
-'use client';
+
 import { useState, FormEvent } from 'react';
 import styled from '@emotion/styled';
 import Button from './Button';

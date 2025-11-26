@@ -1,4 +1,4 @@
-'use client';
+
 import { useState, ChangeEvent } from 'react';
 import styled from '@emotion/styled';
 import Button from '@/components/Button';

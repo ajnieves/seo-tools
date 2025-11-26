@@ -66,7 +66,7 @@ export default function AboutSection() {
         </ListItem>
       </List>
       <Text>
-        Whether you're a content creator, SEO specialist, or digital marketer, our Entity Analyzer provides valuable insights to help you understand and optimize your content for better search engine visibility and user engagement.
+        Whether you&apos;re a content creator, SEO specialist, or digital marketer, our Entity Analyzer provides valuable insights to help you understand and optimize your content for better search engine visibility and user engagement.
       </Text>
     </Container>
   );

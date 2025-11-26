@@ -62,9 +62,9 @@ export default function CalculatorFAQSection() {
         </FAQItem>
 
         <FAQItem>
-          <Question>What's the difference between percentage change and percentage points?</Question>
+          <Question>What&apos;s the difference between percentage change and percentage points?</Question>
           <Answer>
-            Percentage change compares the relative difference between two values, while percentage points measure the absolute difference between two percentages. For example, if a rate increases from 40% to 50%, that's a 25% increase but a 10 percentage point increase.
+            Percentage change compares the relative difference between two values, while percentage points measure the absolute difference between two percentages. For example, if a rate increases from 40% to 50%, that&apos;s a 25% increase but a 10 percentage point increase.
           </Answer>
         </FAQItem>
 

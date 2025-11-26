@@ -1,4 +1,4 @@
-'use client';
+
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import LoadingSpinner from './LoadingSpinner';
@@ -171,8 +171,9 @@ export default function ArticleEvaluator() {
       }
 
       setResult(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to evaluate article. Please check the URL and try again.');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to evaluate article. Please check the URL and try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }

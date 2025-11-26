@@ -57,7 +57,7 @@ export default function SitemapFAQSection() {
         <FAQItem>
           <Question>Why do I need a sitemap?</Question>
           <Answer>
-            Sitemaps help search engines crawl your site more efficiently. They're especially important for large websites, new sites, sites with dynamic content, or sites that aren't well linked internally.
+            Sitemaps help search engines crawl your site more efficiently. They&apos;re especially important for large websites, new sites, sites with dynamic content, or sites that aren&apos;t well linked internally.
           </Answer>
         </FAQItem>
 
@@ -78,7 +78,7 @@ export default function SitemapFAQSection() {
         <FAQItem>
           <Question>How often should I update my sitemap?</Question>
           <Answer>
-            It's recommended to update your sitemap whenever you make significant changes to your website, such as adding new pages or removing old ones. For dynamic sites, consider updating it weekly or monthly.
+            It&apos;s recommended to update your sitemap whenever you make significant changes to your website, such as adding new pages or removing old ones. For dynamic sites, consider updating it weekly or monthly.
           </Answer>
         </FAQItem>
       </FAQList>

@@ -1,4 +1,4 @@
-'use client';
+
 import BaseFAQ, { FAQ } from './shared/BaseFAQ';
 
 const faqs: FAQ[] = [

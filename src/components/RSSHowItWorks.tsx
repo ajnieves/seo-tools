@@ -1,4 +1,4 @@
-'use client';
+
 import BaseHowItWorks, { Step } from './shared/BaseHowItWorks';
 
 const steps: Step[] = [
