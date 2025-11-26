@@ -54,17 +54,27 @@ export async function fetchWithTimeout(
 
 /**
  * User-Agent string for server-side requests
+ * Uses a realistic browser UA to avoid bot detection while being honest about our purpose
  */
 export const DEFAULT_USER_AGENT = 
-  'Mozilla/5.0 (compatible; SEOToolsBot/1.0; +https://technicalseotools.io)';
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 /**
  * Common headers for server-side fetch requests
+ * Mimics a real browser to avoid blocking while remaining transparent
  */
 export const DEFAULT_FETCH_HEADERS: HeadersInit = {
   'User-Agent': DEFAULT_USER_AGENT,
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-  'Accept-Language': 'en-US,en;q=0.5',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Accept-Encoding': 'gzip, deflate, br',
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'Upgrade-Insecure-Requests': '1',
 };
 
 /**
