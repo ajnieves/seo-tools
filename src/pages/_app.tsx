@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import Sidebar from '@/components/Sidebar';
 import MobileMenu from '@/components/MobileMenu';
 import Footer from '@/components/Footer';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const globalStyles = css`
   :root {
@@ -38,6 +39,7 @@ const globalStyles = css`
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -224,14 +226,18 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Global styles={globalStyles} />
-      <Layout>
-        <Sidebar />
-        <MobileMenu />
-        <MainContent>
-          <Component {...pageProps} />
-          <Footer />
-        </MainContent>
-      </Layout>
+      <ErrorBoundary>
+        <Layout>
+          <Sidebar />
+          <MobileMenu />
+          <MainContent>
+            <ErrorBoundary>
+              <Component {...pageProps} />
+            </ErrorBoundary>
+            <Footer />
+          </MainContent>
+        </Layout>
+      </ErrorBoundary>
     </>
   );
 }

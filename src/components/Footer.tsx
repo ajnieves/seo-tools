@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import styled from '@emotion/styled';
+import { footerNavigation } from '@/config/navigation';
 
 const FooterContainer = styled.footer`
   margin-top: var(--space-10);
@@ -117,34 +118,19 @@ const BottomBar = styled.div`
   );
 `;
 
-const tools = [
-  {
-    name: 'Technical SEO',
-    items: [
-      {
-        name: 'XML Sitemap Generator',
-        href: '/sitemap-generator',
-      },
-      {
-        name: 'RSS Feed Parser',
-        href: '/rss-parser',
-      },
-      {
-        name: 'Robots.txt Tester',
-        href: '/robots-tester',
-      },
-    ],
-  },
-  {
-    name: 'Utilities',
-    items: [
-      {
-        name: 'Percentage Calculator',
-        href: '/percentage-calculator',
-      },
-    ],
-  },
-];
+const ArrowIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+);
 
 export default function Footer() {
   return (
@@ -153,33 +139,33 @@ export default function Footer() {
         <FooterSection>
           <SectionTitle>About SEO Tools</SectionTitle>
           <FooterText>
-            A comprehensive suite of tools designed to help you optimize your website's SEO performance and improve your online visibility.
+            A comprehensive suite of tools designed to help you optimize your website&apos;s SEO performance and improve your online visibility.
           </FooterText>
         </FooterSection>
 
-        {tools.map((section) => (
-          <FooterSection key={section.name}>
-            <SectionTitle>{section.name}</SectionTitle>
-            {section.items.map((tool) => (
-              <Link key={tool.href} href={tool.href} passHref legacyBehavior>
-                <StyledLink>
-                  {tool.name}
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </StyledLink>
-              </Link>
-            ))}
-          </FooterSection>
-        ))}
+        <FooterSection>
+          <SectionTitle>{footerNavigation.technicalSeo.name}</SectionTitle>
+          {footerNavigation.technicalSeo.items.map((tool) => (
+            <Link key={tool.href} href={tool.href} passHref legacyBehavior>
+              <StyledLink>
+                {tool.name}
+                {ArrowIcon}
+              </StyledLink>
+            </Link>
+          ))}
+        </FooterSection>
+
+        <FooterSection>
+          <SectionTitle>{footerNavigation.utilities.name}</SectionTitle>
+          {footerNavigation.utilities.items.map((tool) => (
+            <Link key={tool.href} href={tool.href} passHref legacyBehavior>
+              <StyledLink>
+                {tool.name}
+                {ArrowIcon}
+              </StyledLink>
+            </Link>
+          ))}
+        </FooterSection>
       </FooterContent>
 
       <BottomBar>
