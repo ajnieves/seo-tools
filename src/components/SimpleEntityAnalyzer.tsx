@@ -423,17 +423,9 @@ export default function SimpleEntityAnalyzer({ entities }: Props) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const ITEMS_PER_PAGE = 15;
 
-  if (!entities?.length) {
-    return (
-      <EmptyState>
-        <div className="icon">🔍</div>
-        <div>No entities found in the analyzed content</div>
-      </EmptyState>
-    );
-  }
-
-  // Calculate statistics
+  // Calculate statistics (must be before early return)
   const stats = useMemo(() => {
+    if (!entities?.length) return { totalEntities: 0, totalMentions: 0, avgConfidence: 0, typeCount: 0 };
     const totalMentions = entities.reduce((sum, e) => sum + e.mentions, 0);
     const avgConfidence = entities.reduce((sum, e) => sum + e.confidence, 0) / entities.length;
     const typeCount = new Set(entities.map(e => e.type)).size;
@@ -446,16 +438,18 @@ export default function SimpleEntityAnalyzer({ entities }: Props) {
     };
   }, [entities]);
 
-  // Group entities by type for filter chips
+  // Group entities by type for filter chips (must be before early return)
   const entityTypeCount = useMemo(() => {
+    if (!entities?.length) return {};
     return entities.reduce((acc: Record<string, number>, entity) => {
       acc[entity.type] = (acc[entity.type] || 0) + 1;
       return acc;
     }, {});
   }, [entities]);
 
-  // Filter and search
+  // Filter and search (must be before early return)
   const filteredEntities = useMemo(() => {
+    if (!entities?.length) return [];
     let filtered = entities;
     
     // Filter by type
@@ -486,6 +480,16 @@ export default function SimpleEntityAnalyzer({ entities }: Props) {
     setSelectedType(type);
     setCurrentPage(1);
   };
+
+  // Early return AFTER all hooks
+  if (!entities?.length) {
+    return (
+      <EmptyState>
+        <div className="icon">🔍</div>
+        <div>No entities found in the analyzed content</div>
+      </EmptyState>
+    );
+  }
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
