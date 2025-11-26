@@ -1,15 +1,31 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
-import { Container } from '@/components/shared/StyledComponents';
 import SimpleEntityAnalyzer from '@/components/SimpleEntityAnalyzer';
 import EntityHowItWorks from '@/components/EntityHowItWorks';
 import EntityFAQ from '@/components/EntityFAQ';
 import PageHead from '@/components/PageHead';
+import { AnalysisResult } from '@/types/analysis';
+
+const Main = styled.main`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+`;
+
+const Header = styled.header`
+  margin-bottom: var(--space-6);
+`;
 
 const Title = styled.h1`
   font-size: 2.5rem;
   color: var(--primary-color);
-  margin-bottom: var(--space-6);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+`;
+
+const ToolSection = styled.section`
+  margin-bottom: var(--space-8);
 `;
 
 const Input = styled.input`
@@ -63,11 +79,50 @@ const Button = styled.button`
     outline: none;
     box-shadow: 0 0 0 2px var(--primary-light);
   }
+  
+  &:disabled {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+  }
 `;
 
-export default function EntityAnalyzer() {
+const LoadingMessage = styled.div`
+  padding: var(--space-4);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-color);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--surface-hover);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: var(--error-color);
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-md);
+`;
+
+export default function EntityAnalyzerPage() {
   const [url, setUrl] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -88,15 +143,15 @@ export default function EntityAnalyzer() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze URL');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to analyze URL');
       }
 
-      const data = await response.json();
-      console.log('Analysis result:', data);
+      const data: AnalysisResult = await response.json();
       setResult(data);
     } catch (err) {
-      console.error('Error analyzing URL:', err);
-      setError(err instanceof Error ? err.message : 'Failed to analyze URL');
+      const message = err instanceof Error ? err.message : 'Failed to analyze URL';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -104,38 +159,53 @@ export default function EntityAnalyzer() {
 
   return (
     <>
-      <PageHead
-        title="Entity Analyzer - Extract Named Entities from Web Pages"
-        description="Analyze web pages to extract and categorize named entities like people, organizations, locations, and more using advanced natural language processing."
-      />
+      <PageHead />
+      <Main>
+        <article>
+          <Header>
+            <Title>Entity Analyzer</Title>
+          </Header>
 
-      <Container>
-        <Title>Entity Analyzer</Title>
+          <ToolSection aria-label="Entity Analyzer Tool">
+            <Form onSubmit={handleSubmit} role="search">
+              <Input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter URL to analyze (e.g., https://example.com)"
+                disabled={loading}
+                aria-label="URL to analyze"
+              />
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Analyzing...' : 'Analyze'}
+              </Button>
+            </Form>
 
-        <Form onSubmit={handleSubmit}>
-          <Input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter URL to analyze (e.g., https://example.com)"
-            disabled={loading}
-          />
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Analyzing...' : 'Analyze'}
-          </Button>
-        </Form>
+            {loading && (
+              <LoadingMessage>
+                <div className="spinner" />
+                <div>
+                  <strong>🤖 Analyzing with AI-powered entity recognition...</strong>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                    First-time use may take 10-30 seconds to initialize the model
+                  </div>
+                </div>
+              </LoadingMessage>
+            )}
 
-        {error && (
-          <div style={{ color: 'var(--error-color)', marginBottom: 'var(--space-4)' }}>
-            {error}
-          </div>
-        )}
+            {error && (
+              <ErrorMessage role="alert">
+                {error}
+              </ErrorMessage>
+            )}
 
-        {result && <SimpleEntityAnalyzer entities={result.entities} />}
+            {result && <SimpleEntityAnalyzer entities={result.entities} />}
+          </ToolSection>
 
-        <EntityHowItWorks />
-        <EntityFAQ />
-      </Container>
+          <EntityHowItWorks />
+          <EntityFAQ />
+        </article>
+      </Main>
     </>
   );
 }

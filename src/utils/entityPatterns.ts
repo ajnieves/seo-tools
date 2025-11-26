@@ -63,21 +63,132 @@ export const KNOWN_LOCATIONS = new Set([
   'New York', 'Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island',
   'Wall Street', 'Silicon Valley', 'San Francisco', 'Cupertino',
   'California', 'Seattle', 'Washington', 'Boston', 'London', 'Tokyo',
-  'Chicago', 'Los Angeles', 'Pennsylvania'
+  'Chicago', 'Los Angeles', 'Pennsylvania', 'Georgia', 'Florida', 'Texas',
+  'Arizona', 'Nevada', 'Oregon', 'Michigan', 'Wisconsin', 'Ohio',
+  'North Carolina', 'South Carolina', 'Virginia', 'Maryland', 'Delaware',
+  'New Jersey', 'Connecticut', 'Rhode Island', 'Massachusetts', 'Maine',
+  'United States', 'USA', 'America', 'Europe', 'Asia', 'Africa',
+  'Latin America', 'Middle East', 'China', 'France', 'Germany', 'Spain',
+  'Italy', 'Canada', 'Mexico', 'Brazil', 'India', 'Japan', 'Philippines',
+  'Thailand', 'Vietnam', 'Indonesia', 'Australia', 'Colombia', 'Columbia',
+  'Capitol Hill', 'White House', 'Pentagon'
+]);
+
+// Known political figures
+export const KNOWN_POLITICIANS = new Map<string, string>([
+  ['Donald Trump', 'President'],
+  ['Joe Biden', 'President'],
+  ['Kamala Harris', 'Vice President'],
+  ['Marjorie Taylor Greene', 'Representative'],
+  ['Nancy Pelosi', 'Representative'],
+  ['Mitch McConnell', 'Senator'],
+  ['Chuck Schumer', 'Senator'],
+  ['Ron DeSantis', 'Governor'],
+  ['Gavin Newsom', 'Governor']
+]);
+
+// Known organizations for better classification
+export const KNOWN_ORGANIZATIONS = new Set([
+  'Congress', 'House', 'Senate', 'White House', 'Supreme Court',
+  'FBI', 'CIA', 'NSA', 'DOJ', 'IRS', 'FDA', 'CDC', 'EPA',
+  'AP', 'AP News', 'Associated Press', 'Reuters', 'BBC', 'CNN', 'Fox News',
+  'Google', 'Apple', 'Microsoft', 'Amazon', 'Facebook', 'Meta', 'Twitter', 'X'
 ]);
 
 export const IRRELEVANT_ENTITIES = new Set([
   'True Crime', 'Collapse', 'Game', 'Word', 'Search', 'Mini', 'Crossword',
   'Puzzle', 'Stack', 'Match', 'Block', 'Quotes', 'Comments', 'Share',
   'Facebook', 'Twitter', 'Email', 'Print', 'Article', 'Page', 'Section',
-  'Menu', 'Navigation', 'Header', 'Footer', 'Sidebar', 'Button'
+  'Menu', 'Navigation', 'Header', 'Footer', 'Sidebar', 'Button',
+  // Newsletter and menu-related terms
+  'Newsletters', 'Newsletter', 'See All', 'TOP STORIES', 'SECTIONS',
+  'Subscribe', 'Sign', 'Login', 'Account', 'Profile', 'Settings',
+  'Privacy Policy', 'Terms', 'Cookies', 'Contact', 'About', 'Help',
+  // Navigation terms
+  'Click', 'Read More', 'Learn More', 'View All', 'Show More', 'Load More',
+  // Advertisement/career terms
+  'Careers', 'Advertise', 'Advertising', 'Jobs', 'Work', 'Apply',
+  // Generic UI terms
+  'Download', 'Upload', 'Submit', 'Cancel', 'Close', 'Open', 'Back', 'Next',
+  'Previous', 'Continue', 'Confirm', 'Delete', 'Edit', 'Save', 'Update',
+  // Media controls
+  'Play', 'Pause', 'Stop', 'Volume', 'Mute', 'Unmute', 'Fullscreen',
+  // Social/engagement
+  'Like', 'Follow', 'Subscribe', 'Unsubscribe', 'Bookmark', 'Flag',
+  // Generic group references (not specific entities)
+  'Some Republicans', 'Some Democrats', 'Many People', 'Several Officials',
+  'Multiple Sources', 'Various Agencies', 'Some Experts', 'Many Analysts',
+  'America First', 'Home Page', 'Main Story', 'Breaking News'
 ]);
+
+// Common English words that should never be entities
+export const STOP_WORDS = new Set([
+  'But', 'And', 'Or', 'The', 'A', 'An', 'In', 'On', 'At', 'To', 'For', 'Of',
+  'With', 'From', 'By', 'As', 'Is', 'Was', 'Were', 'Been', 'Be', 'Are',
+  'This', 'That', 'These', 'Those', 'It', 'Its', 'Their', 'There', 'They',
+  'He', 'She', 'Him', 'Her', 'His', 'Them', 'Our', 'Your', 'My', 'Me',
+  'We', 'You', 'All', 'Some', 'Any', 'Many', 'Few', 'Other', 'Another',
+  'More', 'Most', 'Less', 'Much', 'Very', 'Such', 'So', 'Just', 'Only'
+]);
+
+// Patterns that indicate menu/navigation content (not real entities)
+export const NAV_PATTERNS = [
+  /^(See All|View All|Show|Load|Click|Read|Browse|Explore).+$/i,
+  /^.+(Menu|Navigation|Nav|Sidebar|Header|Footer).*$/i,
+  /^.+(Newsletter|Newsletters|Subscribe|Sign Up|Sign In|Log In|Log Out).+$/i,
+  /^(TOP STORIES|SECTIONS|Categories|Tags|Archive|Recent|Latest).+$/i,
+  /^.+(Privacy|Terms|Policy|Cookie|Settings|About|Contact|Help|FAQ|Support).+$/i,
+  /^(Download|Upload|Share|Print|Email|Bookmark|Flag|Save|Export).+$/i,
+  /^(Careers|Jobs|Advertise|Advertising|Work|Apply|Join).+$/i,
+  /^(Add|Get|Try|Start|Begin|Launch|Open).+(App|News|Service).+$/i,
+  /^(Google|Apple|Microsoft|Facebook|Twitter|Instagram).+(Add|Get|Download).+$/i
+];
+
+// Filter function to check if an entity name looks like navigation content
+export function isNavigationContent(name: string): boolean {
+  // Filter very short or single-letter entities
+  if (name.length < 3) return true;
+  
+  // Check against stop words
+  if (STOP_WORDS.has(name)) return true;
+  
+  // Check against irrelevant entities
+  if (IRRELEVANT_ENTITIES.has(name)) return true;
+  
+  // Check against navigation patterns
+  if (NAV_PATTERNS.some(pattern => pattern.test(name))) return true;
+  
+  // Check if name is very long (likely concatenated menu items)
+  if (name.length > 50) return true;
+  
+  // Check if name contains too many capitalized words (menu concatenation)
+  const capitalizedWords = (name.match(/[A-Z][a-z]+/g) || []).length;
+  const totalWords = name.split(/\s+/).length;
+  if (totalWords > 5 && capitalizedWords > 4) return true;
+  
+  // Filter entities that are just a single last name
+  const words = name.split(/\s+/);
+  if (words.length === 1 && /^[A-Z][a-z]+$/.test(name) && name.length < 8) {
+    return true; // Single short capitalized word, likely noise
+  }
+  
+  // Filter entities ending with common prepositions (e.g., "House in", "Congress at")
+  if (/\s(in|at|on|to|from|with|by|for|and|or|but)$/i.test(name)) return true;
+  
+  return false;
+}
 
 export const POSSESSIVE_PATTERN = /'s|s'/;
 
 export function cleanEntityName(name: string): string {
   // Remove possessives and extra whitespace
   name = name.replace(POSSESSIVE_PATTERN, '').trim();
+  
+  // Remove trailing punctuation (commas, periods, colons, etc.)
+  name = name.replace(/[,;:\.!?]+$/g, '').trim();
+  
+  // Remove leading articles/prepositions (For X, To X, etc.)
+  name = name.replace(/^(For|To|From|With|By|As)\s+/i, '').trim();
   
   // Filter out irrelevant entities
   if (IRRELEVANT_ENTITIES.has(name)) {

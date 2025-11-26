@@ -50,6 +50,7 @@ export interface EntityMetadata {
     byType: Record<string, number>;
     byCategory: Record<string, number>;
   };
+  extractionMethod?: string;
   timeline?: {
     events: Array<{
       timestamp: string;
