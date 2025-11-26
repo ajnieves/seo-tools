@@ -241,6 +241,18 @@ export default function Footer() {
             </Link>
           ))}
         </FooterSection>
+
+        <FooterSection>
+          <SectionTitle>{footerNavigation.company.name}</SectionTitle>
+          {footerNavigation.company.items.map((item) => (
+            <Link key={item.href} href={item.href} passHref legacyBehavior>
+              <StyledLink as={item.href.startsWith('http') ? 'a' : undefined} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                {item.name}
+                {ArrowIcon}
+              </StyledLink>
+            </Link>
+          ))}
+        </FooterSection>
       </FooterContent>
 
       <BottomBar>

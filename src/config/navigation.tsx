@@ -151,6 +151,19 @@ export const footerNavigation = {
     name: 'Utilities',
     items: navigationItems.filter(item => item.category === 'utilities'),
   },
+  company: {
+    name: 'Company',
+    items: [
+      {
+        name: 'About',
+        href: '/about',
+      },
+      {
+        name: 'GitHub',
+        href: 'https://github.com/ajnieves/seo-tools',
+      },
+    ],
+  },
 };
 
 /**
