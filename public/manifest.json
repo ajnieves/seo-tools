@@ -4,21 +4,20 @@
   "description": "A comprehensive suite of SEO tools including XML sitemap generator, RSS feed parser, robots.txt tester, and percentage calculator.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#00a8e8",
+  "background_color": "#09090B",
+  "theme_color": "#00E5B0",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
     }
   ],
   "categories": ["productivity", "utilities", "web"],
@@ -27,32 +26,33 @@
       "name": "XML Sitemap Generator",
       "short_name": "Sitemap",
       "description": "Generate XML sitemaps for your website",
-      "url": "/sitemap-generator",
-      "icons": [{ "src": "/sitemap-icon.png", "sizes": "192x192" }]
+      "url": "/sitemap-generator"
     },
     {
       "name": "RSS Feed Parser",
       "short_name": "RSS Parser",
       "description": "Parse and analyze RSS feeds",
-      "url": "/rss-parser",
-      "icons": [{ "src": "/rss-icon.png", "sizes": "192x192" }]
-    }
-  ],
-  "screenshots": [
+      "url": "/rss-parser"
+    },
     {
-      "src": "/screenshot1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "SEO Tools Homepage"
+      "name": "Robots.txt Tester",
+      "short_name": "Robots",
+      "description": "Test your robots.txt rules",
+      "url": "/robots-tester"
+    },
+    {
+      "name": "Article Evaluator",
+      "short_name": "Article",
+      "description": "Evaluate article SEO with AI",
+      "url": "/article-evaluator"
+    },
+    {
+      "name": "Entity Analyzer",
+      "short_name": "Entities",
+      "description": "Extract named entities from content",
+      "url": "/entity-analyzer"
     }
   ],
   "related_applications": [],
-  "prefer_related_applications": false,
-  "protocol_handlers": [
-    {
-      "protocol": "web+seotools",
-      "url": "/?tool=%s"
-    }
-  ]
+  "prefer_related_applications": false
 }

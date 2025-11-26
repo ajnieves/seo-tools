@@ -13,13 +13,10 @@ export interface PageMetadata {
   };
 }
 
-interface SiteMetadata {
-  [key: string]: PageMetadata;
-}
+// Use environment variable for flexibility across environments
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://technicalseotools.io';
 
-const BASE_URL = 'https://technicalseotools.io';
-
-export const metadata: SiteMetadata = {
+const metadataMap: Record<string, PageMetadata> = {
   home: {
     title: 'SEO Tools - Comprehensive SEO Toolkit',
     description: 'A suite of powerful SEO tools to help optimize your website, analyze content, and improve search engine visibility.',
@@ -54,13 +51,33 @@ export const metadata: SiteMetadata = {
     keywords: ['percentage calculator', 'SEO metrics', 'conversion calculator', 'performance metrics'],
     canonicalUrl: `${BASE_URL}/percentage-calculator`,
     robots: 'index, follow'
+  },
+  'article-evaluator': {
+    title: 'Article Evaluator - SEO Content Analysis',
+    description: 'Analyze your articles for SEO optimization with AI-powered recommendations.',
+    keywords: ['article evaluator', 'content analysis', 'SEO content', 'article optimization'],
+    canonicalUrl: `${BASE_URL}/article-evaluator`,
+    robots: 'index, follow'
+  },
+  'entity-analyzer': {
+    title: 'Entity Analyzer - Named Entity Recognition',
+    description: 'Extract and analyze named entities from web content for better SEO understanding.',
+    keywords: ['entity analyzer', 'NER', 'named entity recognition', 'content entities'],
+    canonicalUrl: `${BASE_URL}/entity-analyzer`,
+    robots: 'index, follow'
   }
 };
 
-export function getPageMetadata(page: keyof typeof metadata): PageMetadata {
-  return metadata[page];
+// Export for backwards compatibility
+export const metadata = metadataMap;
+
+// Export the type for page keys
+export type PageKey = keyof typeof metadataMap;
+
+export function getPageMetadata(page: string): PageMetadata | undefined {
+  return metadataMap[page];
 }
 
-export function getToolMetadata(page: keyof typeof metadata): PageMetadata['tool'] | undefined {
-  return metadata[page]?.tool;
+export function getToolMetadata(page: string): PageMetadata['tool'] | undefined {
+  return metadataMap[page]?.tool;
 }

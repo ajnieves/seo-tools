@@ -2,5 +2,11 @@
 User-agent: *
 Allow: /
 
-# Sitemap
+# API endpoints should not be crawled
+Disallow: /api/
+
+# Sitemap location
 Sitemap: https://technicalseotools.io/sitemap.xml
+
+# Crawl-delay suggestion (optional, respected by some crawlers)
+Crawl-delay: 1

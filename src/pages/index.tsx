@@ -2,27 +2,50 @@ import styled from '@emotion/styled';
 import Link from 'next/link';
 import PageHead from '@/components/PageHead';
 
-const Container = styled.div`
-  max-width: 800px;
+const Main = styled.main`
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
 `;
 
+const Header = styled.header`
+  text-align: center;
+  margin-bottom: 3rem;
+`;
+
 const Title = styled.h1`
   color: var(--primary-color);
-  text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-size: 2.5rem;
+`;
+
+const Subtitle = styled.p`
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+`;
+
+const Section = styled.section`
+  margin-bottom: 3rem;
+`;
+
+const SectionTitle = styled.h2`
+  color: var(--text-color);
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
 `;
 
 const ToolsGrid = styled.div`
   display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 `;
 
-const ToolCard = styled.div`
-  padding: 2rem;
+const ToolCard = styled.article`
+  padding: 1.5rem;
   background: var(--surface-color);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -30,23 +53,32 @@ const ToolCard = styled.div`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 255, 157, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 229, 176, 0.1);
+    border-color: var(--primary-color);
   }
 `;
 
-const ToolTitle = styled.h2`
+const ToolTitle = styled.h3`
   color: var(--primary-color);
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
 `;
 
 const ToolDescription = styled.p`
   color: var(--text-color);
   line-height: 1.6;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
+  font-size: 0.95rem;
 `;
 
-const tools = [
+const ToolLink = styled(Link)`
+  text-decoration: none;
+  display: block;
+  height: 100%;
+`;
+
+// All available tools organized by category
+const seoTools = [
   {
     title: 'XML Sitemap Generator',
     description: 'Generate XML sitemaps for your website to help search engines better understand and index your content structure.',
@@ -63,6 +95,19 @@ const tools = [
     href: '/robots-tester',
   },
   {
+    title: 'Article Evaluator',
+    description: 'Analyze your articles for SEO optimization with AI-powered recommendations for H1, meta title, and description.',
+    href: '/article-evaluator',
+  },
+  {
+    title: 'Entity Analyzer',
+    description: 'Extract and analyze named entities from web content to understand key subjects, organizations, and locations.',
+    href: '/entity-analyzer',
+  },
+];
+
+const utilityTools = [
+  {
     title: 'Percentage Calculator',
     description: 'Calculate percentages easily. Find percentage increases, decreases, and differences between values.',
     href: '/percentage-calculator',
@@ -74,22 +119,43 @@ export default function Home() {
     <>
       <PageHead />
       
-      <Container>
-        <Title>SEO Tools</Title>
+      <Main>
+        <Header>
+          <Title>SEO Tools</Title>
+          <Subtitle>
+            A comprehensive suite of free tools designed to help you optimize your website&apos;s 
+            SEO performance and improve your online visibility.
+          </Subtitle>
+        </Header>
 
-        <ToolsGrid>
-          {tools.map((tool) => (
-            <Link key={tool.href} href={tool.href} passHref legacyBehavior>
-              <a style={{ textDecoration: 'none' }}>
-                <ToolCard>
+        <Section aria-labelledby="seo-tools-heading">
+          <SectionTitle id="seo-tools-heading">Technical SEO Tools</SectionTitle>
+          <ToolsGrid role="list">
+            {seoTools.map((tool) => (
+              <ToolLink key={tool.href} href={tool.href}>
+                <ToolCard role="listitem">
                   <ToolTitle>{tool.title}</ToolTitle>
                   <ToolDescription>{tool.description}</ToolDescription>
                 </ToolCard>
-              </a>
-            </Link>
-          ))}
-        </ToolsGrid>
-      </Container>
+              </ToolLink>
+            ))}
+          </ToolsGrid>
+        </Section>
+
+        <Section aria-labelledby="utility-tools-heading">
+          <SectionTitle id="utility-tools-heading">Utility Tools</SectionTitle>
+          <ToolsGrid role="list">
+            {utilityTools.map((tool) => (
+              <ToolLink key={tool.href} href={tool.href}>
+                <ToolCard role="listitem">
+                  <ToolTitle>{tool.title}</ToolTitle>
+                  <ToolDescription>{tool.description}</ToolDescription>
+                </ToolCard>
+              </ToolLink>
+            ))}
+          </ToolsGrid>
+        </Section>
+      </Main>
     </>
   );
 }
