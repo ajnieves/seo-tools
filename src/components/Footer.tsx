@@ -244,14 +244,27 @@ export default function Footer() {
 
         <FooterSection>
           <SectionTitle>{footerNavigation.company.name}</SectionTitle>
-          {footerNavigation.company.items.map((item) => (
-            <Link key={item.href} href={item.href} passHref legacyBehavior>
-              <StyledLink as={item.href.startsWith('http') ? 'a' : undefined} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
-                {item.name}
-                {ArrowIcon}
-              </StyledLink>
-            </Link>
-          ))}
+          {footerNavigation.company.items.map((item) => {
+            const isExternal = item.href.startsWith('http');
+            if (isExternal) {
+              return (
+                <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
+                  <StyledLink>
+                    {item.name}
+                    {ArrowIcon}
+                  </StyledLink>
+                </a>
+              );
+            }
+            return (
+              <Link key={item.href} href={item.href} passHref legacyBehavior>
+                <StyledLink>
+                  {item.name}
+                  {ArrowIcon}
+                </StyledLink>
+              </Link>
+            );
+          })}
         </FooterSection>
       </FooterContent>
 
