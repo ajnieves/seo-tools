@@ -60,6 +60,13 @@ export default async function handler(
       });
       
       if (!response.ok) {
+        // Provide helpful error messages based on status code
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            `Access denied (${response.status}). This website blocks automated tools. ` +
+            `Our tool identifies itself honestly as a bot. Consider using the site's official API if available.`
+          );
+        }
         throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`);
       }
 

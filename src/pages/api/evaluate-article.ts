@@ -29,7 +29,13 @@ async function fetchArticleContent(url: string): Promise<string> {
   });
   
   if (!response.ok) {
-    throw new Error(`Failed to fetch article: ${response.statusText}`);
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(
+        `Access denied (${response.status}). This website blocks automated access. ` +
+        `Our tool honestly identifies as a bot and respects site policies.`
+      );
+    }
+    throw new Error(`Failed to fetch article: ${response.status} ${response.statusText}`);
   }
   
   return response.text();
