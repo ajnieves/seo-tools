@@ -190,10 +190,15 @@ export default function Footer() {
   useEffect(() => {
     // Fetch version info
     fetch('/version.json')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch version.json: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => setVersionData(data))
       .catch(() => {
-        // If version.json doesn't exist, use package.json version
+        // If version.json doesn't exist or fetch fails, use fallback version
         setVersionData({
           version: '0.1.0',
           gitHash: 'dev',
