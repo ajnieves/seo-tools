@@ -4,9 +4,8 @@ const nextConfig = {
   compiler: {
     emotion: true
   },
-  eslint: {
-    ignoreDuringBuilds: true
-  }
+  // ESLint is now enabled during builds
+  // Fix any linting errors before deploying
 };
 
 module.exports = nextConfig;
