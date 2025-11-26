@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { AnalysisResult, EntityMetadata, Entity } from '@/types/analysis';
 import { extractEntities } from '@/services/entityExtraction';
-import { extractEntitiesWithTransformers, getModelStatus } from '@/services/transformersEntityExtraction';
 import { setCorsHeaders } from '@/utils/cors';
 import { validateUrlOrThrow } from '@/utils/urlValidation';
 import { safeFetch, DEFAULT_TIMEOUT } from '@/utils/fetchWithTimeout';
@@ -102,32 +101,12 @@ export default async function handler(
       console.error('[Entity Analysis] Error processing document structure:', error);
     }
 
-    // Extract entities using Transformers (with fallback to regex)
+    // Extract entities using pattern-based extraction
     let entities: Entity[] = [];
-    let extractionMethod = 'transformers';
+    const extractionMethod = 'pattern-based';
     
     try {
-      // Check if we should use transformers (default: yes)
-      const useTransformers = req.body.useTransformers !== false;
-      
-      if (useTransformers) {
-        const modelStatus = getModelStatus();
-        if (modelStatus.initializing) {
-          console.log('[Entity Analysis] Model is initializing, this may take a moment...');
-        }
-        
-        try {
-          entities = await extractEntitiesWithTransformers(text);
-          console.log(`[Entity Analysis] Extracted ${entities.length} entities using Transformers`);
-        } catch (transformerError) {
-          console.warn('[Entity Analysis] Transformers extraction failed, falling back to regex:', transformerError);
-          entities = extractEntities(text, processedStructure);
-          extractionMethod = 'regex-fallback';
-        }
-      } else {
-        entities = extractEntities(text, processedStructure);
-        extractionMethod = 'regex';
-      }
+      entities = extractEntities(text, processedStructure);
     } catch (error) {
       console.error('[Entity Analysis] Error extracting entities:', error);
       return res.status(500).json({ 
